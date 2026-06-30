@@ -1,10 +1,23 @@
 import { useReveal } from '../hooks/useReveal'
 import { usePortfolioData } from '../data/PortfolioDataContext'
 
+// বাংলা অক্ষরে কনজাংক্ট/মাত্রা (যেমন 'জু' এর 'ু') আলাদা কোড-পয়েন্ট হিসেবে থাকে।
+// সাধারণ স্ট্রিং স্প্রেড দিয়ে ভাঙলে প্রথম অক্ষরের সাথে মাত্রাটা বিচ্ছিন্ন হয়ে যায়
+// (যেমন: 'জুনাইদ' থেকে শুধু 'জ' আলাদা হয়ে 'ু' পরের অংশে চলে যায়)।
+// তাই Intl.Segmenter দিয়ে প্রকৃত গ্রাফিম (visual character) আলাদা করা হচ্ছে।
+function splitFirstGrapheme(str) {
+  if (typeof Intl !== 'undefined' && Intl.Segmenter) {
+    const segmenter = new Intl.Segmenter('bn', { granularity: 'grapheme' })
+    const first = segmenter.segment(str)[Symbol.iterator]().next().value
+    if (first) return [first.segment, str.slice(first.segment.length)]
+  }
+  return [str[0] || '', str.slice(1)]
+}
+
 export default function About() {
   const { personalInfo } = usePortfolioData()
   const ref = useReveal()
-  const [firstChar, ...restChars] = personalInfo.bio[0]
+  const [firstChar, restText] = splitFirstGrapheme(personalInfo.bio[0] || '')
 
   return (
     <section id="porichiti" ref={ref} className="opacity-0 translate-y-7 transition-[opacity,transform] duration-[650ms] ease-[cubic-bezier(.22,1,.36,1)] py-20
@@ -24,7 +37,7 @@ export default function About() {
             <span className="font-['Tiro_Bangla'] text-[3.4rem] float-left leading-[.85] pr-3 pt-1.5 text-green-400">
               {firstChar}
             </span>
-            {restChars.join('')}
+            {restText}
           </p>
           {personalInfo.bio.slice(1).map((para, i) => (
             <p key={i} className={i < personalInfo.bio.length - 2 ? 'mb-4' : ''}>{para}</p>

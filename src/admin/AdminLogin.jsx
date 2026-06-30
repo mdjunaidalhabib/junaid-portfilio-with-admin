@@ -98,6 +98,11 @@ export default function AdminLogin({ onLoggedIn }) {
           <p className="text-sm text-slate-500 text-center -mt-2">
             আপনার এডমিন ইমেইল দিন, আমরা একটা রিসেট লিংক পাঠাবো।
           </p>
+          <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-3 py-2 text-center">
+            আপনি প্রতি <span className="font-semibold">{RESET_LIMIT_WINDOW_MS / 60000} মিনিটে</span> সর্বোচ্চ{' '}
+            <span className="font-semibold">{RESET_LIMIT_COUNT} বার</span> রিসেট লিংক চাইতে পারবেন। এর বেশি হলে{' '}
+            {RESET_LIMIT_WINDOW_MS / 60000} মিনিট পর আবার চেষ্টা করতে হবে।
+          </p>
 
           <div>
             <label className="block text-sm text-slate-600 mb-1">ইমেইল</label>

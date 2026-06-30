@@ -1,8 +1,26 @@
 import { useEffect, useState } from 'react'
-import { Eye, EyeOff, Pencil, Check } from 'lucide-react'
+import {
+  Eye, EyeOff, Pencil, Check, LogOut, LayoutDashboard,
+  User, Phone, Share2, Menu, BarChart3, GraduationCap,
+  Briefcase, BookOpen, Quote as QuoteIcon, MoonStar, KeyRound,
+} from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import * as defaults from '../data/demoData'
 import { useToast } from './Toast'
+
+const SECTION_ICONS = {
+  personalInfo: User,
+  contactInfo: Phone,
+  socialLinks: Share2,
+  navItems: Menu,
+  stats: BarChart3,
+  educations: GraduationCap,
+  roles: Briefcase,
+  writings: BookOpen,
+  quote: QuoteIcon,
+  footerDua: MoonStar,
+  account: KeyRound,
+}
 
 const SECTIONS = [
   { key: 'personalInfo', label: 'ব্যক্তিগত তথ্য', type: 'object' },
@@ -28,6 +46,7 @@ export default function AdminPanel({ onLogout }) {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [version, setVersion] = useState(0) // বাড়লে সব ফিল্ড আবার রিড-মোডে চলে যায়
+  const [editingField, setEditingField] = useState(null) // একসাথে একটাই ফিল্ড এডিট-মোডে থাকবে
 
   useEffect(() => {
     loadAll()
@@ -63,6 +82,7 @@ export default function AdminPanel({ onLogout }) {
     toast.success('সফলভাবে আপডেট হয়েছে ✓')
     setOriginal((prev) => ({ ...prev, [sectionKey]: JSON.parse(JSON.stringify(content[sectionKey])) }))
     setVersion((v) => v + 1) // সব ফিল্ড আবার রিড-মোডে রিসেট হবে
+    setEditingField(null)
   }
 
   const activeSection = SECTIONS.find((s) => s.key === activeKey)
@@ -70,70 +90,94 @@ export default function AdminPanel({ onLogout }) {
 
   return (
     <div className="min-h-screen bg-slate-100 flex flex-col">
-      <header className="bg-white border-b border-slate-200 px-4 sm:px-6 py-3 flex items-center justify-between">
-        <h1 className="font-bold text-slate-800">পোর্টফোলিও এডমিন প্যানেল</h1>
-        <button onClick={onLogout} className="text-sm text-red-600 hover:underline">লগআউট</button>
+      <header className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white px-4 sm:px-6 py-3.5 flex items-center justify-between shadow-md sticky top-0 z-10">
+        <div className="flex items-center gap-2.5">
+          <span className="bg-green-500/20 text-green-400 rounded-lg p-2">
+            <LayoutDashboard size={18} />
+          </span>
+          <h1 className="font-bold tracking-tight">পোর্টফোলিও এডমিন প্যানেল</h1>
+        </div>
+        <button
+          onClick={onLogout}
+          className="flex items-center gap-1.5 text-sm font-medium bg-red-600 hover:bg-red-700 active:bg-red-800 text-white rounded-md px-3.5 py-2 transition-colors shadow-sm"
+        >
+          <LogOut size={15} />
+          লগআউট
+        </button>
       </header>
 
       {loading ? (
         <div className="flex-1 flex items-center justify-center text-slate-500">লোড হচ্ছে...</div>
       ) : (
         <div className="flex-1 flex flex-col sm:flex-row">
-          <nav className="sm:w-56 bg-white border-r border-slate-200 p-3 flex sm:flex-col gap-1 overflow-x-auto">
-            {SECTIONS.map((s) => (
-              <button
-                key={s.key}
-                onClick={() => setActiveKey(s.key)}
-                className={`text-left text-sm rounded-md px-3 py-2 whitespace-nowrap ${
-                  activeKey === s.key ? 'bg-green-600 text-white' : 'text-slate-700 hover:bg-slate-100'
-                }`}
-              >
-                {s.label}
-              </button>
-            ))}
+          <nav className="sm:w-64 bg-white border-r border-slate-200 p-3 flex sm:flex-col gap-1 overflow-x-auto shadow-sm">
+            {SECTIONS.map((s) => {
+              const Icon = SECTION_ICONS[s.key] || User
+              const active = activeKey === s.key
+              return (
+                <button
+                  key={s.key}
+                  onClick={() => { setActiveKey(s.key); setEditingField(null) }}
+                  className={`flex items-center gap-2.5 text-left text-sm rounded-lg px-3.5 py-2.5 whitespace-nowrap transition-all ${
+                    active
+                      ? 'bg-gradient-to-r from-green-600 to-green-500 text-white shadow-sm font-medium'
+                      : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                  }`}
+                >
+                  <Icon size={16} className={active ? 'text-white' : 'text-slate-400'} />
+                  {s.label}
+                </button>
+              )
+            })}
           </nav>
 
-          <main className="flex-1 p-4 sm:p-6 overflow-y-auto">
-            <h2 className="text-lg font-semibold text-slate-800 mb-4">{activeSection.label}</h2>
+          <main className="flex-1 p-4 sm:p-8 overflow-y-auto">
+            <div className="max-w-2xl mx-auto">
+              <h2 className="text-lg font-semibold text-slate-800 mb-4">{activeSection.label}</h2>
 
-            {activeSection.type === 'account' ? (
-              <ChangePasswordForm />
-            ) : (
-              <>
-                {activeSection.type === 'object' ? (
-                  <ObjectEditor
-                    sectionKey={activeKey}
-                    version={version}
-                    value={content[activeKey]}
-                    onChange={(v) => updateField(activeKey, v)}
-                  />
-                ) : (
-                  <ArrayEditor
-                    sectionKey={activeKey}
-                    version={version}
-                    value={content[activeKey]}
-                    onChange={(v) => updateField(activeKey, v)}
-                  />
-                )}
-
-                <div className="mt-6 flex items-center gap-3">
-                  <button
-                    onClick={() => saveSection(activeKey)}
-                    disabled={saving || !isDirty}
-                    className={`text-sm font-medium rounded-md px-5 py-2 transition-colors ${
-                      isDirty && !saving
-                        ? 'bg-green-600 hover:bg-green-700 text-white'
-                        : 'bg-slate-200 text-slate-400 cursor-not-allowed'
-                    }`}
-                  >
-                    {saving ? 'আপডেট হচ্ছে...' : 'আপডেট করুন'}
-                  </button>
-                  {!isDirty && !saving && (
-                    <span className="text-xs text-slate-400">কোনো পরিবর্তন করা হয়নি</span>
+              {activeSection.type === 'account' ? (
+                <ChangePasswordForm />
+              ) : (
+                <>
+                  {activeSection.type === 'object' ? (
+                    <ObjectEditor
+                      sectionKey={activeKey}
+                      version={version}
+                      value={content[activeKey]}
+                      onChange={(v) => updateField(activeKey, v)}
+                      editingField={editingField}
+                      setEditingField={setEditingField}
+                    />
+                  ) : (
+                    <ArrayEditor
+                      sectionKey={activeKey}
+                      version={version}
+                      value={content[activeKey]}
+                      onChange={(v) => updateField(activeKey, v)}
+                      editingField={editingField}
+                      setEditingField={setEditingField}
+                    />
                   )}
-                </div>
-              </>
-            )}
+
+                  <div className="mt-6 flex items-center gap-3">
+                    <button
+                      onClick={() => saveSection(activeKey)}
+                      disabled={saving || !isDirty}
+                      className={`text-sm font-medium rounded-md px-5 py-2 transition-colors ${
+                        isDirty && !saving
+                          ? 'bg-green-600 hover:bg-green-700 text-white'
+                          : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                      }`}
+                    >
+                      {saving ? 'আপডেট হচ্ছে...' : 'আপডেট করুন'}
+                    </button>
+                    {!isDirty && !saving && (
+                      <span className="text-xs text-slate-400">কোনো পরিবর্তন করা হয়নি</span>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
           </main>
         </div>
       )}
@@ -142,7 +186,7 @@ export default function AdminPanel({ onLogout }) {
 }
 
 // ── অবজেক্ট (key: value) এডিটর ───────────────────────────────
-function ObjectEditor({ sectionKey, version, value, onChange }) {
+function ObjectEditor({ sectionKey, version, value, onChange, editingField, setEditingField }) {
   if (!value) return null
   const entries = Object.entries(value)
 
@@ -155,6 +199,9 @@ function ObjectEditor({ sectionKey, version, value, onChange }) {
       {entries.map(([field, val]) => (
         <FieldInput
           key={`${sectionKey}-${field}-${version}`}
+          fieldId={`${sectionKey}-${field}`}
+          editingField={editingField}
+          setEditingField={setEditingField}
           label={field}
           value={val}
           onChange={(v) => setField(field, v)}
@@ -165,7 +212,7 @@ function ObjectEditor({ sectionKey, version, value, onChange }) {
 }
 
 // ── অ্যারে (লিস্ট অফ অবজেক্ট/স্ট্রিং) এডিটর ─────────────────
-function ArrayEditor({ sectionKey, version, value, onChange }) {
+function ArrayEditor({ sectionKey, version, value, onChange, editingField, setEditingField }) {
   if (!Array.isArray(value)) return null
 
   function updateItem(idx, newItem) {
@@ -202,6 +249,9 @@ function ArrayEditor({ sectionKey, version, value, onChange }) {
               {Object.entries(item).map(([field, val]) => (
                 <FieldInput
                   key={`${sectionKey}-${idx}-${field}-${version}`}
+                  fieldId={`${sectionKey}-${idx}-${field}`}
+                  editingField={editingField}
+                  setEditingField={setEditingField}
                   label={field}
                   value={val}
                   onChange={(v) => updateItem(idx, { ...item, [field]: v })}
@@ -212,6 +262,9 @@ function ArrayEditor({ sectionKey, version, value, onChange }) {
             <div className="pr-14">
               <FieldInput
                 key={`${sectionKey}-${idx}-${version}`}
+                fieldId={`${sectionKey}-${idx}`}
+                editingField={editingField}
+                setEditingField={setEditingField}
                 label={`আইটেম ${idx + 1}`}
                 value={item}
                 onChange={(v) => updateItem(idx, v)}
@@ -231,14 +284,17 @@ function ArrayEditor({ sectionKey, version, value, onChange }) {
 }
 
 // ── একক ফিল্ড ইনপুট — ডিফল্টে রিড-মোড, এডিট আইকনে ক্লিক করলে এডিটেবল হবে ─
-function FieldInput({ label, value, onChange }) {
-  const [editing, setEditing] = useState(false)
+// fieldId/editingField/setEditingField শেয়ার করা হয় উপরের লেভেল থেকে, যাতে
+// একটা ফিল্ড এডিট করার সময় অন্য ফিল্ডের এডিট আইকনে ক্লিক করলে আগেরটা বন্ধ হয়ে যায়
+function FieldInput({ fieldId, editingField, setEditingField, label, value, onChange }) {
+  const editing = editingField === fieldId
+  const toggleEditing = () => setEditingField(editing ? null : fieldId)
 
   const wrapperClass = 'relative group'
   const editButton = (
     <button
       type="button"
-      onClick={() => setEditing((v) => !v)}
+      onClick={toggleEditing}
       className={`absolute right-2 top-[26px] p-1 rounded transition-colors ${
         editing ? 'text-green-600 bg-green-50' : 'text-slate-400 hover:text-green-600 hover:bg-slate-100'
       }`}
@@ -280,7 +336,7 @@ function FieldInput({ label, value, onChange }) {
         {label}
         <button
           type="button"
-          onClick={() => setEditing((v) => !v)}
+          onClick={toggleEditing}
           className={`p-1 rounded ${editing ? 'text-green-600 bg-green-50' : 'text-slate-400 hover:text-green-600'}`}
           title={editing ? 'এডিট শেষ করুন' : 'এডিট করুন'}
         >
