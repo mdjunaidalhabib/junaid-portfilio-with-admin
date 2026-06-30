@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: #f8fafc;
+    color: #0f172a;
+    font-family: 'Hind Siliguri', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: #f8fafc; }
+  ::-webkit-scrollbar-thumb { background: #22c55e; border-radius: 4px; }
+}
+
+@layer utilities {
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+  @keyframes spin-slow { to{transform:rotate(360deg)} }
+  @keyframes spin-slow-rev { to{transform:rotate(-360deg)} }
+  @keyframes shimmer-green {
+    0%   { background-position: -400% center; }
+    100% { background-position:  400% center; }
+  }
+  @keyframes reveal-up {
+    from { opacity:0; transform:translateY(32px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  @keyframes nav-drop {
+    from { opacity:0; transform:translateY(-10px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  .animate-spin-slow { animation: spin-slow 20s linear infinite; }
+  .animate-spin-slow-rev { animation: spin-slow-rev 32s linear infinite; }
+  .animate-nav-drop { animation: nav-drop .25s ease; }
+}
