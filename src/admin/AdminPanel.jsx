@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
-import { Eye, EyeOff } from 'lucide-react'
+import { Eye, EyeOff, Pencil, Check } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import * as defaults from '../data/demoData'
+import { useToast } from './Toast'
 
 const SECTIONS = [
   { key: 'personalInfo', label: 'ব্যক্তিগত তথ্য', type: 'object' },
@@ -20,11 +21,13 @@ const SECTIONS = [
 const TABLE = 'portfolio_content'
 
 export default function AdminPanel({ onLogout }) {
+  const toast = useToast()
   const [activeKey, setActiveKey] = useState(SECTIONS[0].key)
   const [content, setContent] = useState({})
+  const [original, setOriginal] = useState({})
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [status, setStatus] = useState('')
+  const [version, setVersion] = useState(0) // বাড়লে সব ফিল্ড আবার রিড-মোডে চলে যায়
 
   useEffect(() => {
     loadAll()
@@ -39,6 +42,7 @@ export default function AdminPanel({ onLogout }) {
       merged[key] = row ? row.content : defaults[key]
     })
     setContent(merged)
+    setOriginal(JSON.parse(JSON.stringify(merged)))
     setLoading(false)
   }
 
@@ -48,15 +52,21 @@ export default function AdminPanel({ onLogout }) {
 
   async function saveSection(sectionKey) {
     setSaving(true)
-    setStatus('')
     const { error } = await supabase
       .from(TABLE)
       .upsert({ section_key: sectionKey, content: content[sectionKey] }, { onConflict: 'section_key' })
     setSaving(false)
-    setStatus(error ? 'সেভ করতে সমস্যা হয়েছে: ' + error.message : 'সফলভাবে সেভ হয়েছে ✓')
+    if (error) {
+      toast.error('সেভ করতে সমস্যা হয়েছে: ' + error.message)
+      return
+    }
+    toast.success('সফলভাবে আপডেট হয়েছে ✓')
+    setOriginal((prev) => ({ ...prev, [sectionKey]: JSON.parse(JSON.stringify(content[sectionKey])) }))
+    setVersion((v) => v + 1) // সব ফিল্ড আবার রিড-মোডে রিসেট হবে
   }
 
   const activeSection = SECTIONS.find((s) => s.key === activeKey)
+  const isDirty = JSON.stringify(content[activeKey]) !== JSON.stringify(original[activeKey])
 
   return (
     <div className="min-h-screen bg-slate-100 flex flex-col">
@@ -73,7 +83,7 @@ export default function AdminPanel({ onLogout }) {
             {SECTIONS.map((s) => (
               <button
                 key={s.key}
-                onClick={() => { setActiveKey(s.key); setStatus('') }}
+                onClick={() => setActiveKey(s.key)}
                 className={`text-left text-sm rounded-md px-3 py-2 whitespace-nowrap ${
                   activeKey === s.key ? 'bg-green-600 text-white' : 'text-slate-700 hover:bg-slate-100'
                 }`}
@@ -91,20 +101,36 @@ export default function AdminPanel({ onLogout }) {
             ) : (
               <>
                 {activeSection.type === 'object' ? (
-                  <ObjectEditor value={content[activeKey]} onChange={(v) => updateField(activeKey, v)} />
+                  <ObjectEditor
+                    sectionKey={activeKey}
+                    version={version}
+                    value={content[activeKey]}
+                    onChange={(v) => updateField(activeKey, v)}
+                  />
                 ) : (
-                  <ArrayEditor value={content[activeKey]} onChange={(v) => updateField(activeKey, v)} />
+                  <ArrayEditor
+                    sectionKey={activeKey}
+                    version={version}
+                    value={content[activeKey]}
+                    onChange={(v) => updateField(activeKey, v)}
+                  />
                 )}
 
                 <div className="mt-6 flex items-center gap-3">
                   <button
                     onClick={() => saveSection(activeKey)}
-                    disabled={saving}
-                    className="bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-md px-5 py-2 disabled:opacity-60"
+                    disabled={saving || !isDirty}
+                    className={`text-sm font-medium rounded-md px-5 py-2 transition-colors ${
+                      isDirty && !saving
+                        ? 'bg-green-600 hover:bg-green-700 text-white'
+                        : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                    }`}
                   >
-                    {saving ? 'সেভ হচ্ছে...' : 'সেভ করুন'}
+                    {saving ? 'আপডেট হচ্ছে...' : 'আপডেট করুন'}
                   </button>
-                  {status && <span className="text-sm text-slate-600">{status}</span>}
+                  {!isDirty && !saving && (
+                    <span className="text-xs text-slate-400">কোনো পরিবর্তন করা হয়নি</span>
+                  )}
                 </div>
               </>
             )}
@@ -116,7 +142,7 @@ export default function AdminPanel({ onLogout }) {
 }
 
 // ── অবজেক্ট (key: value) এডিটর ───────────────────────────────
-function ObjectEditor({ value, onChange }) {
+function ObjectEditor({ sectionKey, version, value, onChange }) {
   if (!value) return null
   const entries = Object.entries(value)
 
@@ -127,14 +153,19 @@ function ObjectEditor({ value, onChange }) {
   return (
     <div className="space-y-4 bg-white rounded-lg p-4 sm:p-5 shadow-sm">
       {entries.map(([field, val]) => (
-        <FieldInput key={field} label={field} value={val} onChange={(v) => setField(field, v)} />
+        <FieldInput
+          key={`${sectionKey}-${field}-${version}`}
+          label={field}
+          value={val}
+          onChange={(v) => setField(field, v)}
+        />
       ))}
     </div>
   )
 }
 
 // ── অ্যারে (লিস্ট অফ অবজেক্ট/স্ট্রিং) এডিটর ─────────────────
-function ArrayEditor({ value, onChange }) {
+function ArrayEditor({ sectionKey, version, value, onChange }) {
   if (!Array.isArray(value)) return null
 
   function updateItem(idx, newItem) {
@@ -170,7 +201,7 @@ function ArrayEditor({ value, onChange }) {
             <div className="space-y-3 pr-14">
               {Object.entries(item).map(([field, val]) => (
                 <FieldInput
-                  key={field}
+                  key={`${sectionKey}-${idx}-${field}-${version}`}
                   label={field}
                   value={val}
                   onChange={(v) => updateItem(idx, { ...item, [field]: v })}
@@ -179,7 +210,12 @@ function ArrayEditor({ value, onChange }) {
             </div>
           ) : (
             <div className="pr-14">
-              <FieldInput label={`আইটেম ${idx + 1}`} value={item} onChange={(v) => updateItem(idx, v)} />
+              <FieldInput
+                key={`${sectionKey}-${idx}-${version}`}
+                label={`আইটেম ${idx + 1}`}
+                value={item}
+                onChange={(v) => updateItem(idx, v)}
+              />
             </div>
           )}
         </div>
@@ -194,18 +230,40 @@ function ArrayEditor({ value, onChange }) {
   )
 }
 
-// ── একক ফিল্ড ইনপুট (টাইপ বুঝে text/textarea/number/checkbox) ─
+// ── একক ফিল্ড ইনপুট — ডিফল্টে রিড-মোড, এডিট আইকনে ক্লিক করলে এডিটেবল হবে ─
 function FieldInput({ label, value, onChange }) {
+  const [editing, setEditing] = useState(false)
+
+  const wrapperClass = 'relative group'
+  const editButton = (
+    <button
+      type="button"
+      onClick={() => setEditing((v) => !v)}
+      className={`absolute right-2 top-[26px] p-1 rounded transition-colors ${
+        editing ? 'text-green-600 bg-green-50' : 'text-slate-400 hover:text-green-600 hover:bg-slate-100'
+      }`}
+      title={editing ? 'এডিট শেষ করুন' : 'এডিট করুন'}
+    >
+      {editing ? <Check size={14} /> : <Pencil size={14} />}
+    </button>
+  )
+
   if (Array.isArray(value)) {
     return (
-      <div>
+      <div className={wrapperClass}>
         <label className="block text-xs text-slate-500 mb-1">{label} (একাধিক লাইন, প্রতি লাইনে একটি)</label>
         <textarea
           rows={Math.max(2, value.length)}
           value={value.join('\n')}
           onChange={(e) => onChange(e.target.value.split('\n'))}
-          className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+          readOnly={!editing}
+          className={`w-full border rounded-md px-3 py-2 pr-9 text-sm focus:outline-none ${
+            editing
+              ? 'border-slate-300 focus:ring-2 focus:ring-green-500 bg-white'
+              : 'border-slate-200 bg-slate-50 text-slate-500 cursor-default'
+          }`}
         />
+        {editButton}
       </div>
     )
   }
@@ -213,76 +271,105 @@ function FieldInput({ label, value, onChange }) {
   if (typeof value === 'boolean') {
     return (
       <label className="flex items-center gap-2 text-sm text-slate-700">
-        <input type="checkbox" checked={value} onChange={(e) => onChange(e.target.checked)} />
+        <input
+          type="checkbox"
+          checked={value}
+          disabled={!editing}
+          onChange={(e) => onChange(e.target.checked)}
+        />
         {label}
+        <button
+          type="button"
+          onClick={() => setEditing((v) => !v)}
+          className={`p-1 rounded ${editing ? 'text-green-600 bg-green-50' : 'text-slate-400 hover:text-green-600'}`}
+          title={editing ? 'এডিট শেষ করুন' : 'এডিট করুন'}
+        >
+          {editing ? <Check size={14} /> : <Pencil size={14} />}
+        </button>
       </label>
     )
   }
 
   if (typeof value === 'number') {
     return (
-      <div>
+      <div className={wrapperClass}>
         <label className="block text-xs text-slate-500 mb-1">{label}</label>
         <input
           type="number"
           value={value}
+          readOnly={!editing}
           onChange={(e) => onChange(Number(e.target.value))}
-          className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+          className={`w-full border rounded-md px-3 py-2 pr-9 text-sm focus:outline-none ${
+            editing
+              ? 'border-slate-300 focus:ring-2 focus:ring-green-500 bg-white'
+              : 'border-slate-200 bg-slate-50 text-slate-500 cursor-default'
+          }`}
         />
+        {editButton}
       </div>
     )
   }
 
   const isLong = typeof value === 'string' && value.length > 70
   return (
-    <div>
+    <div className={wrapperClass}>
       <label className="block text-xs text-slate-500 mb-1">{label}</label>
       {isLong ? (
         <textarea
           rows={3}
           value={value}
+          readOnly={!editing}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+          className={`w-full border rounded-md px-3 py-2 pr-9 text-sm focus:outline-none ${
+            editing
+              ? 'border-slate-300 focus:ring-2 focus:ring-green-500 bg-white'
+              : 'border-slate-200 bg-slate-50 text-slate-500 cursor-default'
+          }`}
         />
       ) : (
         <input
           type="text"
           value={value ?? ''}
+          readOnly={!editing}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+          className={`w-full border rounded-md px-3 py-2 pr-9 text-sm focus:outline-none ${
+            editing
+              ? 'border-slate-300 focus:ring-2 focus:ring-green-500 bg-white'
+              : 'border-slate-200 bg-slate-50 text-slate-500 cursor-default'
+          }`}
         />
       )}
+      {editButton}
     </div>
   )
 }
 
 // ── পাসওয়ার্ড পরিবর্তন (লগইন করা অবস্থায়) ───────────────────
 function ChangePasswordForm() {
+  const toast = useToast()
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [status, setStatus] = useState('')
 
   async function handleSubmit(e) {
     e.preventDefault()
-    setStatus('')
     if (newPassword.length < 6) {
-      setStatus('পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।')
+      toast.error('পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।')
       return
     }
     if (newPassword !== confirmPassword) {
-      setStatus('দুইটা পাসওয়ার্ড মিলছে না।')
+      toast.error('দুইটা পাসওয়ার্ড মিলছে না।')
       return
     }
     setSaving(true)
     const { error } = await supabase.auth.updateUser({ password: newPassword })
     setSaving(false)
     if (error) {
-      setStatus('পাসওয়ার্ড পরিবর্তন করতে সমস্যা হয়েছে: ' + error.message)
+      toast.error('পাসওয়ার্ড পরিবর্তন করতে সমস্যা হয়েছে: ' + error.message)
       return
     }
-    setStatus('পাসওয়ার্ড সফলভাবে পরিবর্তন হয়েছে ✓')
+    toast.success('পাসওয়ার্ড সফলভাবে পরিবর্তন হয়েছে ✓')
     setNewPassword('')
     setConfirmPassword('')
   }
@@ -320,10 +407,6 @@ function ChangePasswordForm() {
           className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
         />
       </div>
-
-      {status && (
-        <p className={`text-sm ${status.includes('✓') ? 'text-green-700' : 'text-red-600'}`}>{status}</p>
-      )}
 
       <button
         type="submit"

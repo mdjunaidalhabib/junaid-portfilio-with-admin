@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
 import { supabase } from '../lib/supabase'
+import { useToast } from './Toast'
 
 export default function ResetPasswordForm({ onDone }) {
+  const toast = useToast()
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -25,8 +27,10 @@ export default function ResetPasswordForm({ onDone }) {
     setLoading(false)
     if (error) {
       setError('পাসওয়ার্ড পরিবর্তন করতে সমস্যা হয়েছে: ' + error.message)
+      toast.error('পাসওয়ার্ড পরিবর্তন করতে সমস্যা হয়েছে: ' + error.message)
       return
     }
+    toast.success('পাসওয়ার্ড সফলভাবে পরিবর্তন হয়েছে ✓')
     onDone()
   }
 

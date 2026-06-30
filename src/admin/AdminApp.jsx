@@ -3,8 +3,17 @@ import { supabase, isSupabaseConfigured } from '../lib/supabase'
 import AdminLogin from './AdminLogin'
 import AdminPanel from './AdminPanel'
 import ResetPasswordForm from './ResetPasswordForm'
+import { ToastProvider } from './Toast'
 
 export default function AdminApp() {
+  return (
+    <ToastProvider>
+      <AdminAppInner />
+    </ToastProvider>
+  )
+}
+
+function AdminAppInner() {
   const [session, setSession] = useState(null)
   const [checking, setChecking] = useState(true)
   const [recoveryMode, setRecoveryMode] = useState(false)
