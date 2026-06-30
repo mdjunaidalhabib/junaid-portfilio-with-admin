@@ -2,10 +2,12 @@ import { useEffect, useState } from 'react'
 import { supabase, isSupabaseConfigured } from '../lib/supabase'
 import AdminLogin from './AdminLogin'
 import AdminPanel from './AdminPanel'
+import ResetPasswordForm from './ResetPasswordForm'
 
 export default function AdminApp() {
   const [session, setSession] = useState(null)
   const [checking, setChecking] = useState(true)
+  const [recoveryMode, setRecoveryMode] = useState(false)
 
   useEffect(() => {
     if (!isSupabaseConfigured) { setChecking(false); return }
@@ -13,8 +15,12 @@ export default function AdminApp() {
       setSession(data.session)
       setChecking(false)
     })
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, newSession) => {
+    const { data: listener } = supabase.auth.onAuthStateChange((event, newSession) => {
       setSession(newSession)
+      // Supabase রিসেট-পাসওয়ার্ড লিংক থেকে এলে এই ইভেন্ট আসে
+      if (event === 'PASSWORD_RECOVERY') {
+        setRecoveryMode(true)
+      }
     })
     return () => listener.subscription.unsubscribe()
   }, [])
@@ -34,6 +40,17 @@ export default function AdminApp() {
 
   if (checking) {
     return <div className="min-h-screen flex items-center justify-center text-slate-500">লোড হচ্ছে...</div>
+  }
+
+  if (recoveryMode) {
+    return (
+      <ResetPasswordForm
+        onDone={() => {
+          setRecoveryMode(false)
+          window.history.replaceState(null, '', '/admin')
+        }}
+      />
+    )
   }
 
   if (!session) {

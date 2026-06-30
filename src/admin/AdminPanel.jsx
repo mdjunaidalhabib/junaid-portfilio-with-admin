@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Eye, EyeOff } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import * as defaults from '../data/demoData'
 
@@ -13,6 +14,7 @@ const SECTIONS = [
   { key: 'writings', label: 'লেখালেখি / বই', type: 'array' },
   { key: 'quote', label: 'অনুপ্রেরণামূলক উক্তি', type: 'object' },
   { key: 'footerDua', label: 'ফুটারের আরবি দোয়া', type: 'object' },
+  { key: 'account', label: 'পাসওয়ার্ড পরিবর্তন', type: 'account' },
 ]
 
 const TABLE = 'portfolio_content'
@@ -84,22 +86,28 @@ export default function AdminPanel({ onLogout }) {
           <main className="flex-1 p-4 sm:p-6 overflow-y-auto">
             <h2 className="text-lg font-semibold text-slate-800 mb-4">{activeSection.label}</h2>
 
-            {activeSection.type === 'object' ? (
-              <ObjectEditor value={content[activeKey]} onChange={(v) => updateField(activeKey, v)} />
+            {activeSection.type === 'account' ? (
+              <ChangePasswordForm />
             ) : (
-              <ArrayEditor value={content[activeKey]} onChange={(v) => updateField(activeKey, v)} />
-            )}
+              <>
+                {activeSection.type === 'object' ? (
+                  <ObjectEditor value={content[activeKey]} onChange={(v) => updateField(activeKey, v)} />
+                ) : (
+                  <ArrayEditor value={content[activeKey]} onChange={(v) => updateField(activeKey, v)} />
+                )}
 
-            <div className="mt-6 flex items-center gap-3">
-              <button
-                onClick={() => saveSection(activeKey)}
-                disabled={saving}
-                className="bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-md px-5 py-2 disabled:opacity-60"
-              >
-                {saving ? 'সেভ হচ্ছে...' : 'সেভ করুন'}
-              </button>
-              {status && <span className="text-sm text-slate-600">{status}</span>}
-            </div>
+                <div className="mt-6 flex items-center gap-3">
+                  <button
+                    onClick={() => saveSection(activeKey)}
+                    disabled={saving}
+                    className="bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-md px-5 py-2 disabled:opacity-60"
+                  >
+                    {saving ? 'সেভ হচ্ছে...' : 'সেভ করুন'}
+                  </button>
+                  {status && <span className="text-sm text-slate-600">{status}</span>}
+                </div>
+              </>
+            )}
           </main>
         </div>
       )}
@@ -245,5 +253,85 @@ function FieldInput({ label, value, onChange }) {
         />
       )}
     </div>
+  )
+}
+
+// ── পাসওয়ার্ড পরিবর্তন (লগইন করা অবস্থায়) ───────────────────
+function ChangePasswordForm() {
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [status, setStatus] = useState('')
+
+  async function handleSubmit(e) {
+    e.preventDefault()
+    setStatus('')
+    if (newPassword.length < 6) {
+      setStatus('পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।')
+      return
+    }
+    if (newPassword !== confirmPassword) {
+      setStatus('দুইটা পাসওয়ার্ড মিলছে না।')
+      return
+    }
+    setSaving(true)
+    const { error } = await supabase.auth.updateUser({ password: newPassword })
+    setSaving(false)
+    if (error) {
+      setStatus('পাসওয়ার্ড পরিবর্তন করতে সমস্যা হয়েছে: ' + error.message)
+      return
+    }
+    setStatus('পাসওয়ার্ড সফলভাবে পরিবর্তন হয়েছে ✓')
+    setNewPassword('')
+    setConfirmPassword('')
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="bg-white rounded-lg p-4 sm:p-5 shadow-sm max-w-sm space-y-4">
+      <div>
+        <label className="block text-xs text-slate-500 mb-1">নতুন পাসওয়ার্ড</label>
+        <div className="relative">
+          <input
+            type={showPassword ? 'text' : 'password'}
+            required
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            className="w-full border border-slate-300 rounded-md px-3 py-2 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword((v) => !v)}
+            tabIndex={-1}
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+          >
+            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+          </button>
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-xs text-slate-500 mb-1">নতুন পাসওয়ার্ড আবার দিন</label>
+        <input
+          type={showPassword ? 'text' : 'password'}
+          required
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+        />
+      </div>
+
+      {status && (
+        <p className={`text-sm ${status.includes('✓') ? 'text-green-700' : 'text-red-600'}`}>{status}</p>
+      )}
+
+      <button
+        type="submit"
+        disabled={saving}
+        className="bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-md px-5 py-2 disabled:opacity-60"
+      >
+        {saving ? 'সেভ হচ্ছে...' : 'পাসওয়ার্ড পরিবর্তন করুন'}
+      </button>
+    </form>
   )
 }
