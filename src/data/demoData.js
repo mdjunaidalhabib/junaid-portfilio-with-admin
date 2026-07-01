@@ -18,6 +18,7 @@ export const personalInfo = {
   specialization: 'আপনার বিশেষত্বের ক্ষেত্র',
   languages:      'বাংলা, ইংরেজি',
   profileImage:   '/images/profile.jpeg',
+  cvUrl:          '/cv.pdf',
   copyright:      '© ২০২৬ আপনার নাম · সর্বস্বত্ব সংরক্ষিত',
 }
 

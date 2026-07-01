@@ -18,6 +18,7 @@ export const personalInfo = {
   specialization: 'তাফসীর ও হাদীস',
   languages:      'বাংলা, আরবি',
   profileImage:   '/images/profile.jpeg',
+  cvUrl:          '/cv.pdf',
   copyright:      '© ২০২৬ মোহাম্মদ জুনাইদ আল হাবিব · সর্বস্বত্ব সংরক্ষিত',
 }
 

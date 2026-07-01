@@ -7,6 +7,10 @@ node_modules/
 dist/
 dist-ssr/
 build/
+*.local
+
+# Vite
+.vite/
 
 # Environment variables
 .env
@@ -34,6 +38,7 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+*.log
 
 # Cache
 .eslintcache

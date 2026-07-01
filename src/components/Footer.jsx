@@ -1,19 +1,14 @@
-import { FaFacebook, FaYoutube, FaWhatsapp } from 'react-icons/fa'
-import { Mail } from 'lucide-react'
+import { FaFacebook, FaYoutube, FaWhatsapp, FaEnvelope } from 'react-icons/fa'
 import { usePortfolioData } from '../data/PortfolioDataContext'
-
-const footerIconMap = {
-  facebook: <FaFacebook size={16} />,
-  youtube:  <FaYoutube size={16} />,
-}
+import { BRAND } from '../data/brandColors'
 
 export default function Footer() {
   const { personalInfo, contactInfo, socialLinks, footerDua } = usePortfolioData()
   const footerIcons = [
-    { label: 'ফেসবুক',       icon: <FaFacebook size={16} />, href: socialLinks.find(s => s.platform === 'fb_page')?.href || '#' },
-    { label: 'ইউটিউব',       icon: <FaYoutube size={16} />,  href: socialLinks.find(s => s.platform === 'youtube')?.href  || '#' },
-    { label: 'হোয়াটসঅ্যাপ', icon: <FaWhatsapp size={16} />, href: contactInfo.whatsapp },
-    { label: 'ইমেইল',        icon: <Mail size={16} />,        href: `mailto:${contactInfo.email}` },
+    { label: 'ফেসবুক',       platform: 'facebook', icon: <FaFacebook size={16} />, href: socialLinks.find(s => s.platform === 'fb_page')?.href || '#' },
+    { label: 'ইউটিউব',       platform: 'youtube',  icon: <FaYoutube size={16} />,  href: socialLinks.find(s => s.platform === 'youtube')?.href  || '#' },
+    { label: 'হোয়াটসঅ্যাপ', platform: 'whatsapp', icon: <FaWhatsapp size={16} />, href: contactInfo.whatsapp },
+    { label: 'ইমেইল',        platform: 'email',    icon: <FaEnvelope size={16} />, href: `mailto:${contactInfo.email}` },
   ]
   return (
     <footer className="bg-gradient-to-b from-green-50 to-green-100">
@@ -40,16 +35,19 @@ export default function Footer() {
 
         {/* Social icons */}
         <div className="flex justify-center gap-3 mb-8">
-          {footerIcons.map((s, i) => (
-            <a key={i} href={s.href} aria-label={s.label}
-              className="w-[42px] h-[42px] rounded-full border-[1.5px] border-green-400/20 bg-green-500/5
-                flex items-center justify-center text-green-700 no-underline
-                hover:bg-gradient-to-br hover:from-green-400 hover:to-green-600 hover:border-green-400
-                hover:text-white hover:-translate-y-1 hover:scale-110 hover:shadow-[0_8px_20px_rgba(34,197,94,.3)]
-                transition-all duration-300">
-              {s.icon}
-            </a>
-          ))}
+          {footerIcons.map((s, i) => {
+            const b = BRAND[s.platform]
+            return (
+              <a key={i} href={s.href} aria-label={s.label}
+                className="w-[42px] h-[42px] rounded-full border-[1.5px] flex items-center justify-center
+                  no-underline hover:-translate-y-1 hover:scale-110 transition-all duration-300"
+                style={{ borderColor: b.border, background: b.bg, color: b.color }}
+                onMouseOver={e => { e.currentTarget.style.background = b.color; e.currentTarget.style.color = '#fff'; e.currentTarget.style.boxShadow = `0 8px 20px ${b.border}` }}
+                onMouseOut={e => { e.currentTarget.style.background = b.bg; e.currentTarget.style.color = b.color; e.currentTarget.style.boxShadow = 'none' }}>
+                {s.icon}
+              </a>
+            )
+          })}
         </div>
 
         {/* Divider */}

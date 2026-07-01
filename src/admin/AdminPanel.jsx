@@ -1,10 +1,12 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import {
   Eye, EyeOff, Pencil, Check, LogOut, LayoutDashboard,
   User, Phone, Share2, Menu, BarChart3, GraduationCap,
   Briefcase, BookOpen, Quote as QuoteIcon, MoonStar, KeyRound,
+  Image as ImageIcon, FileText, UploadCloud, Loader2,
 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
+import { uploadAsset } from '../lib/storage'
 import * as defaults from '../data/demoData'
 import { useToast } from './Toast'
 
@@ -56,9 +58,18 @@ export default function AdminPanel({ onLogout }) {
     setLoading(true)
     const { data, error } = await supabase.from(TABLE).select('section_key, content')
     const merged = {}
-    SECTIONS.forEach(({ key }) => {
+    SECTIONS.forEach(({ key, type }) => {
       const row = !error && data ? data.find((r) => r.section_key === key) : null
-      merged[key] = row ? row.content : defaults[key]
+      const saved = row ? row.content : null
+      const base = defaults[key]
+
+      if (saved && type === 'object' && base && typeof base === 'object' && !Array.isArray(base)) {
+        // পুরনো সেভ করা ডেটায় নতুন যুক্ত হওয়া ফিল্ড (যেমন cvUrl) না থাকলে
+        // ডিফল্ট থেকে সেটা যুক্ত করে দেয়, যাতে সেটা এডমিন প্যানেলে দেখা যায়
+        merged[key] = { ...base, ...saved }
+      } else {
+        merged[key] = saved || base
+      }
     })
     setContent(merged)
     setOriginal(JSON.parse(JSON.stringify(merged)))
@@ -196,17 +207,148 @@ function ObjectEditor({ sectionKey, version, value, onChange, editingField, setE
 
   return (
     <div className="space-y-4 bg-white rounded-lg p-4 sm:p-5 shadow-sm">
-      {entries.map(([field, val]) => (
-        <FieldInput
-          key={`${sectionKey}-${field}-${version}`}
-          fieldId={`${sectionKey}-${field}`}
-          editingField={editingField}
-          setEditingField={setEditingField}
-          label={field}
-          value={val}
-          onChange={(v) => setField(field, v)}
-        />
-      ))}
+      {entries.map(([field, val]) => {
+        if (sectionKey === 'personalInfo' && field === 'profileImage') {
+          return (
+            <ImageUploadField
+              key={`${sectionKey}-${field}-${version}`}
+              value={val}
+              onChange={(v) => setField(field, v)}
+            />
+          )
+        }
+        if (sectionKey === 'personalInfo' && field === 'cvUrl') {
+          return (
+            <PdfUploadField
+              key={`${sectionKey}-${field}-${version}`}
+              value={val}
+              onChange={(v) => setField(field, v)}
+            />
+          )
+        }
+        return (
+          <FieldInput
+            key={`${sectionKey}-${field}-${version}`}
+            fieldId={`${sectionKey}-${field}`}
+            editingField={editingField}
+            setEditingField={setEditingField}
+            label={field}
+            value={val}
+            onChange={(v) => setField(field, v)}
+          />
+        )
+      })}
+    </div>
+  )
+}
+
+// ── প্রোফাইল ছবি আপলোড (হিরো সেকশন + ন্যাভবার লোগো — দুই জায়গায়ই এই ছবি দেখায়) ─
+function ImageUploadField({ value, onChange }) {
+  const toast = useToast()
+  const [uploading, setUploading] = useState(false)
+  const inputRef = useRef(null)
+
+  async function handleFile(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (!file.type.startsWith('image/')) {
+      toast.error('অনুগ্রহ করে একটা ছবি ফাইল নির্বাচন করুন (jpg/png/webp)।')
+      return
+    }
+    setUploading(true)
+    try {
+      const ext = file.name.split('.').pop() || 'jpg'
+      const url = await uploadAsset(file, `profile.${ext}`)
+      onChange(url)
+      toast.success('ছবি আপলোড হয়েছে — এখন নিচে "আপডেট করুন" চাপুন সেভ করতে')
+    } catch (err) {
+      toast.error('ছবি আপলোড করতে সমস্যা হয়েছে: ' + err.message)
+    } finally {
+      setUploading(false)
+      if (inputRef.current) inputRef.current.value = ''
+    }
+  }
+
+  return (
+    <div>
+      <label className="block text-xs text-slate-500 mb-2">প্রোফাইল ছবি (হিরো সেকশন ও ন্যাভবার লোগো)</label>
+      <div className="flex items-center gap-4">
+        <div className="w-16 h-16 rounded-full overflow-hidden border border-slate-200 bg-slate-50 flex items-center justify-center flex-shrink-0">
+          {value
+            ? <img src={value} alt="প্রোফাইল" className="w-full h-full object-cover" />
+            : <ImageIcon size={20} className="text-slate-300" />
+          }
+        </div>
+        <div className="flex-1">
+          <input ref={inputRef} type="file" accept="image/*" onChange={handleFile} className="hidden" id="profile-image-input" />
+          <label
+            htmlFor="profile-image-input"
+            className={`inline-flex items-center gap-2 text-sm font-medium rounded-md px-4 py-2 cursor-pointer transition-colors ${
+              uploading ? 'bg-slate-100 text-slate-400' : 'bg-green-600 hover:bg-green-700 text-white'
+            }`}
+          >
+            {uploading ? <Loader2 size={15} className="animate-spin" /> : <UploadCloud size={15} />}
+            {uploading ? 'আপলোড হচ্ছে...' : 'নতুন ছবি আপলোড করুন'}
+          </label>
+          <p className="text-[.7rem] text-slate-400 mt-1.5">JPG, PNG বা WebP</p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ── CV / জীবনবৃত্তান্ত PDF আপলোড ────────────────────────────
+function PdfUploadField({ value, onChange }) {
+  const toast = useToast()
+  const [uploading, setUploading] = useState(false)
+  const inputRef = useRef(null)
+
+  async function handleFile(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (file.type !== 'application/pdf') {
+      toast.error('অনুগ্রহ করে একটা PDF ফাইল নির্বাচন করুন।')
+      return
+    }
+    setUploading(true)
+    try {
+      const url = await uploadAsset(file, 'cv.pdf')
+      onChange(url)
+      toast.success('CV আপলোড হয়েছে — এখন নিচে "আপডেট করুন" চাপুন সেভ করতে')
+    } catch (err) {
+      toast.error('CV আপলোড করতে সমস্যা হয়েছে: ' + err.message)
+    } finally {
+      setUploading(false)
+      if (inputRef.current) inputRef.current.value = ''
+    }
+  }
+
+  return (
+    <div>
+      <label className="block text-xs text-slate-500 mb-2">CV / জীবনবৃত্তান্ত (PDF)</label>
+      <div className="flex items-center gap-4">
+        <div className="w-16 h-16 rounded-xl overflow-hidden border border-slate-200 bg-slate-50 flex items-center justify-center flex-shrink-0">
+          <FileText size={22} className={value ? 'text-red-500' : 'text-slate-300'} />
+        </div>
+        <div className="flex-1">
+          <input ref={inputRef} type="file" accept="application/pdf" onChange={handleFile} className="hidden" id="cv-pdf-input" />
+          <label
+            htmlFor="cv-pdf-input"
+            className={`inline-flex items-center gap-2 text-sm font-medium rounded-md px-4 py-2 cursor-pointer transition-colors ${
+              uploading ? 'bg-slate-100 text-slate-400' : 'bg-green-600 hover:bg-green-700 text-white'
+            }`}
+          >
+            {uploading ? <Loader2 size={15} className="animate-spin" /> : <UploadCloud size={15} />}
+            {uploading ? 'আপলোড হচ্ছে...' : 'নতুন CV আপলোড করুন'}
+          </label>
+          {value && (
+            <a href={value} target="_blank" rel="noreferrer" className="block text-[.75rem] text-green-700 hover:underline mt-1.5 truncate max-w-xs">
+              বর্তমান CV দেখুন →
+            </a>
+          )}
+          <p className="text-[.7rem] text-slate-400 mt-1">শুধু PDF ফাইল </p>
+        </div>
+      </div>
     </div>
   )
 }
@@ -283,9 +425,6 @@ function ArrayEditor({ sectionKey, version, value, onChange, editingField, setEd
   )
 }
 
-// ── একক ফিল্ড ইনপুট — ডিফল্টে রিড-মোড, এডিট আইকনে ক্লিক করলে এডিটেবল হবে ─
-// fieldId/editingField/setEditingField শেয়ার করা হয় উপরের লেভেল থেকে, যাতে
-// একটা ফিল্ড এডিট করার সময় অন্য ফিল্ডের এডিট আইকনে ক্লিক করলে আগেরটা বন্ধ হয়ে যায়
 function FieldInput({ fieldId, editingField, setEditingField, label, value, onChange }) {
   const editing = editingField === fieldId
   const toggleEditing = () => setEditingField(editing ? null : fieldId)

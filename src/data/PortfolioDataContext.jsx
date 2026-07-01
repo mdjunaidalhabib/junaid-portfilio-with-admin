@@ -40,7 +40,15 @@ export function PortfolioDataProvider({ children }) {
         const merged = {}
         SECTION_KEYS.forEach((key) => {
           const row = rows.find((r) => r.section_key === key)
-          merged[key] = row ? row.content : defaults[key]
+          const saved = row ? row.content : null
+          const base = defaults[key]
+          if (saved && base && typeof base === 'object' && !Array.isArray(base)) {
+            // পুরনো সেভ করা ডেটায় নতুন যুক্ত হওয়া ফিল্ড (যেমন cvUrl) না থাকলে
+            // ডিফল্ট থেকে সেটা যুক্ত করে দেয়, যাতে সাইট ভেঙে না যায়
+            merged[key] = { ...base, ...saved }
+          } else {
+            merged[key] = saved || base
+          }
         })
         setData(merged)
       } else if (error) {
