@@ -44,10 +44,31 @@ export function PortfolioDataProvider({ children }) {
           const base = defaults[key]
           if (saved && base && typeof base === 'object' && !Array.isArray(base)) {
             // পুরনো সেভ করা ডেটায় নতুন যুক্ত হওয়া ফিল্ড (যেমন cvUrl) না থাকলে
-            // ডিফল্ট থেকে সেটা যুক্ত করে দেয়, যাতে সাইট ভেঙে না যায়
-            merged[key] = { ...base, ...saved }
+            // ডিফল্ট থেকে সেটা যুক্ত করে দেয়, যাতে সাইট ভেঙে না যায়।
+            // আর যেসব ফিল্ড আর ব্যবহার হয় না (যেমন phoneTel, copyright) সেগুলো
+            // পুরনো সেভ করা ডেটায় থাকলেও এখানে বাদ পড়ে যায়।
+            merged[key] = { ...base }
+            Object.keys(base).forEach((field) => {
+              if (saved[field] !== undefined) merged[key][field] = saved[field]
+            })
           } else {
             merged[key] = saved || base
+          }
+        })
+        // অ্যারে-টাইপ সেকশনের প্রতিটা আইটেমকে বর্তমান ডিফল্ট শেপের সাথে মিলিয়ে নেয় —
+        // নতুন ফিল্ড (যেমন badge) না থাকলে খালি মান যোগ হয়, পুরনো অব্যবহৃত ফিল্ড
+        // (highlight, platform, accentFrom ইত্যাদি) থাকলে বাদ পড়ে যায়
+        SECTION_KEYS.forEach((key) => {
+          const template = Array.isArray(defaults[key]) ? defaults[key][0] : null
+          if (Array.isArray(merged[key]) && template && typeof template === 'object') {
+            const shapeKeys = Object.keys(template)
+            merged[key] = merged[key].map((item) => {
+              const normalized = {}
+              shapeKeys.forEach((field) => {
+                normalized[field] = item && item[field] !== undefined ? item[field] : template[field]
+              })
+              return normalized
+            })
           }
         })
         setData(merged)

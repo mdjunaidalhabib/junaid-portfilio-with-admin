@@ -19,54 +19,25 @@ export const personalInfo = {
   languages:      'বাংলা, আরবি',
   profileImage:   '/images/profile.jpeg',
   cvUrl:          '/cv.pdf',
-  copyright:      '© ২০২৬ মোহাম্মদ জুনাইদ আল হাবিব · সর্বস্বত্ব সংরক্ষিত',
 }
 
 // ─── যোগাযোগ তথ্য ────────────────────────────────────────────
+// ফোন/হোয়াটসঅ্যাপ নাম্বার শুধু সংখ্যা আকারে (+৮৮ ছাড়া) — tel:/wa.me
+// লিংক কোড থেকেই অটোমেটিক তৈরি হয়
 export const contactInfo = {
   phone:    '01624-114405',
-  phoneTel: 'tel:+8801624114405',
   email:    'mdjunaidalhabib2626@gmail.com',
   location: 'ঢাকা, বাংলাদেশ',
-  whatsapp: 'https://wa.me/8801624114405',
+  whatsapp: '01624-114405',
 }
 
 // ─── সামাজিক মাধ্যম ──────────────────────────────────────────
-// fb_id   → Hero section-এ ব্যবহার হয় (ব্যক্তিগত প্রোফাইল)
-// fb_page → Footer ও Contact section-এ ব্যবহার হয় (পেজ)
+// শুধু নাম ও লিংক — আইকন/রঙ লিংক দেখে অটোমেটিক ঠিক হয়ে যায়
 export const socialLinks = [
-  {
-    label:      'ফেসবুক আইডি',
-    platform:   'fb_id',
-    href:       'https://www.facebook.com/share/1Biz9s6ueR',
-    hoverBorder:'rgba(59,130,246,.25)',
-    hoverBg:    'rgba(59,130,246,.07)',
-    hoverColor: '#3b82f6',
-  },
-  {
-    label:      'ফেসবুক পেজ',
-    platform:   'fb_page',
-    href:       'https://www.facebook.com/share/1CDyFiZyhe',
-    hoverBorder:'rgba(59,130,246,.25)',
-    hoverBg:    'rgba(59,130,246,.07)',
-    hoverColor: '#3b82f6',
-  },
-  {
-    label:      'ইউটিউব চ্যানেল',
-    platform:   'youtube',
-    href:       '#',
-    hoverBorder:'rgba(239,68,68,.25)',
-    hoverBg:    'rgba(239,68,68,.07)',
-    hoverColor: '#ef4444',
-  },
-  {
-    label:      'টেলিগ্রাম',
-    platform:   'telegram',
-    href:       '#',
-    hoverBorder:'rgba(14,165,233,.25)',
-    hoverBg:    'rgba(14,165,233,.07)',
-    hoverColor: '#0ea5e9',
-  },
+  { label: 'ফেসবুক আইডি',    href: 'https://www.facebook.com/share/1Biz9s6ueR' },
+  { label: 'ফেসবুক পেজ',     href: 'https://www.facebook.com/share/1CDyFiZyhe' },
+  { label: 'ইউটিউব চ্যানেল', href: '#' },
+  { label: 'টেলিগ্রাম',      href: '#' },
 ]
 
 // ─── ন্যাভবার লিংক ───────────────────────────────────────────
@@ -88,49 +59,41 @@ export const stats = [
 // ─── শিক্ষাজীবন ──────────────────────────────────────────────
 export const educations = [
   {
-    year:      '২০XX',
-    degree:    'দাওরায়ে হাদীস (তাকমিল)',
-    inst:      '[প্রতিষ্ঠানের নাম]',
-    badge:     'সর্বোচ্চ ফলাফলে উত্তীর্ণ',
-    highlight: true,
+    year:   '২০XX',
+    degree: 'দাওরায়ে হাদীস (তাকমিল)',
+    inst:   '[প্রতিষ্ঠানের নাম]',
+    badge:  'সর্বোচ্চ ফলাফলে উত্তীর্ণ',
   },
   {
     year:   '২০XX',
     degree: 'ফাজিল / আলিম',
     inst:   '[প্রতিষ্ঠানের নাম]',
+    badge:  '',
   },
   {
     year:   '২০XX',
     degree: 'মাধ্যমিক (দাখিল)',
     inst:   '[প্রতিষ্ঠানের নাম]',
+    badge:  '',
   },
 ]
 
 // ─── কর্মক্ষেত্র ও দায়িত্ব ──────────────────────────────────
 export const roles = [
   {
-    icon:        '🕌',
-    title:       'ইমাম ও খতিব',
-    desc:        '[মসজিদের নাম লিখুন] — সাল ২০xx থেকে নিয়মিত ইমামতি ও জুমার খুতবা পরিচালনা করছেন।',
-    accentFrom:  'from-yellow-400',
-    accentTo:    'to-yellow-600',
-    hoverBg:     'hover:bg-yellow-500/6',
+    icon:  '🕌',
+    title: 'ইমাম ও খতিব',
+    desc:  '[মসজিদের নাম লিখুন] — সাল ২০xx থেকে নিয়মিত ইমামতি ও জুমার খুতবা পরিচালনা করছেন।',
   },
   {
-    icon:        '📖',
-    title:       'মাদরাসা শিক্ষক',
-    desc:        '[মাদরাসার নাম লিখুন] — তাফসীর, হাদীস ও আরবি সাহিত্য বিভাগে শিক্ষকতা করছেন।',
-    accentFrom:  'from-green-400',
-    accentTo:    'to-green-600',
-    hoverBg:     'hover:bg-green-500/6',
+    icon:  '📖',
+    title: 'মাদরাসা শিক্ষক',
+    desc:  '[মাদরাসার নাম লিখুন] — তাফসীর, হাদীস ও আরবি সাহিত্য বিভাগে শিক্ষকতা করছেন।',
   },
   {
-    icon:        '✍️',
-    title:       'লেখক',
-    desc:        'বিভিন্ন ইসলামি ম্যাগাজিন ও অনলাইন প্ল্যাটফর্মে নিয়মিত প্রবন্ধ ও বই লিখে চলেছেন।',
-    accentFrom:  'from-yellow-400',
-    accentTo:    'to-yellow-600',
-    hoverBg:     'hover:bg-yellow-500/6',
+    icon:  '✍️',
+    title: 'লেখক',
+    desc:  'বিভিন্ন ইসলামি ম্যাগাজিন ও অনলাইন প্ল্যাটফর্মে নিয়মিত প্রবন্ধ ও বই লিখে চলেছেন।',
   },
 ]
 

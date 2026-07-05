@@ -19,50 +19,23 @@ export const personalInfo = {
   languages:      'বাংলা, ইংরেজি',
   profileImage:   '/images/profile.jpeg',
   cvUrl:          '/cv.pdf',
-  copyright:      '© ২০২৬ আপনার নাম · সর্বস্বত্ব সংরক্ষিত',
 }
 
+// ফোন/হোয়াটসঅ্যাপ নাম্বার শুধু সংখ্যা আকারে দিন (+৮৮ ছাড়া) —
+// tel: ও wa.me লিংক কোড থেকেই অটোমেটিক তৈরি হয়ে যাবে
 export const contactInfo = {
   phone:    '01XXX-XXXXXX',
-  phoneTel: 'tel:+880XXXXXXXXXX',
   email:    'youremail@example.com',
   location: 'আপনার শহর, বাংলাদেশ',
-  whatsapp: 'https://wa.me/880XXXXXXXXXX',
+  whatsapp: '01XXX-XXXXXX',
 }
 
+// প্রতিটার শুধু নাম ও লিংক দিলেই হবে — আইকন ও রঙ লিংক দেখে অটোমেটিক ঠিক হয়ে যায়
 export const socialLinks = [
-  {
-    label:      'ফেসবুক আইডি',
-    platform:   'fb_id',
-    href:       '#',
-    hoverBorder:'rgba(59,130,246,.25)',
-    hoverBg:    'rgba(59,130,246,.07)',
-    hoverColor: '#3b82f6',
-  },
-  {
-    label:      'ফেসবুক পেজ',
-    platform:   'fb_page',
-    href:       '#',
-    hoverBorder:'rgba(59,130,246,.25)',
-    hoverBg:    'rgba(59,130,246,.07)',
-    hoverColor: '#3b82f6',
-  },
-  {
-    label:      'ইউটিউব চ্যানেল',
-    platform:   'youtube',
-    href:       '#',
-    hoverBorder:'rgba(239,68,68,.25)',
-    hoverBg:    'rgba(239,68,68,.07)',
-    hoverColor: '#ef4444',
-  },
-  {
-    label:      'টেলিগ্রাম',
-    platform:   'telegram',
-    href:       '#',
-    hoverBorder:'rgba(14,165,233,.25)',
-    hoverBg:    'rgba(14,165,233,.07)',
-    hoverColor: '#0ea5e9',
-  },
+  { label: 'ফেসবুক আইডি',    href: '#' },
+  { label: 'ফেসবুক পেজ',     href: '#' },
+  { label: 'ইউটিউব চ্যানেল', href: '#' },
+  { label: 'টেলিগ্রাম',      href: '#' },
 ]
 
 export const navItems = [
@@ -80,17 +53,14 @@ export const stats = [
 ]
 
 export const educations = [
-  { year: '২০XX', degree: 'ডিগ্রির নাম', inst: 'প্রতিষ্ঠানের নাম', badge: '', highlight: false },
+  { year: '২০XX', degree: 'ডিগ্রির নাম', inst: 'প্রতিষ্ঠানের নাম', badge: '' },
 ]
 
 export const roles = [
   {
-    icon:        '🕌',
-    title:       'দায়িত্বের নাম',
-    desc:        'দায়িত্বের সংক্ষিপ্ত বিবরণ এখানে লিখুন।',
-    accentFrom:  'from-yellow-400',
-    accentTo:    'to-yellow-600',
-    hoverBg:     'hover:bg-yellow-500/6',
+    icon:  '🕌',
+    title: 'দায়িত্বের নাম',
+    desc:  'দায়িত্বের সংক্ষিপ্ত বিবরণ এখানে লিখুন।',
   },
 ]
 

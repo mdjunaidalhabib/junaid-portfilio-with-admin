@@ -1,6 +1,13 @@
 import { useReveal } from '../hooks/useReveal'
 import { usePortfolioData } from '../data/PortfolioDataContext'
 
+// কার্ডের রঙ (হোভার ব্যাকগ্রাউন্ড + নিচের এক্সেন্ট লাইন) এখন অটোমেটিক
+// পালা করে বসে — এডমিন থেকে এটা আলাদা করে সেট করার দরকার নেই
+const ROLE_THEMES = [
+  { hoverBg: 'hover:bg-yellow-500/6', accentFrom: 'from-yellow-400', accentTo: 'to-yellow-600' },
+  { hoverBg: 'hover:bg-green-500/6',  accentFrom: 'from-green-400',  accentTo: 'to-green-600'  },
+]
+
 export default function Roles() {
   const { roles } = usePortfolioData()
   const ref = useReveal()
@@ -17,19 +24,22 @@ export default function Roles() {
       <div className="h-0.5 w-10 bg-gradient-to-r from-green-400 to-transparent rounded mb-9" />
 
       <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-5">
-        {roles.map((r, i) => (
-          <div key={i} className={`relative overflow-hidden bg-white border border-slate-900/7 rounded-2xl
-            shadow-[0_1px_6px_rgba(0,0,0,.04),0_4px_18px_rgba(0,0,0,.03)] p-6 sm:p-7 cursor-default
-            transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_10px_40px_rgba(0,0,0,.09)] ${r.hoverBg}
-            group`}>
-            <div className="absolute top-3 left-3 w-[18px] h-[18px] border-t border-l border-green-400/30 rounded-tl-[3px]" />
-            <div className="text-3xl mb-4 mt-2">{r.icon}</div>
-            <div className="font-['Tiro_Bangla'] text-[1.2rem] text-slate-900 mb-2.5">{r.title}</div>
-            <p className="text-[.875rem] leading-7 text-slate-500">{r.desc}</p>
-            <div className={`absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r ${r.accentFrom} ${r.accentTo} via-transparent
-              scale-x-0 origin-left transition-transform duration-400 group-hover:scale-x-100 rounded-b-2xl`} />
-          </div>
-        ))}
+        {roles.map((r, i) => {
+          const theme = ROLE_THEMES[i % ROLE_THEMES.length]
+          return (
+            <div key={i} className={`relative overflow-hidden bg-white border border-slate-900/7 rounded-2xl
+              shadow-[0_1px_6px_rgba(0,0,0,.04),0_4px_18px_rgba(0,0,0,.03)] p-6 sm:p-7 cursor-default
+              transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_10px_40px_rgba(0,0,0,.09)] ${theme.hoverBg}
+              group`}>
+              <div className="absolute top-3 left-3 w-[18px] h-[18px] border-t border-l border-green-400/30 rounded-tl-[3px]" />
+              <div className="text-3xl mb-4 mt-2">{r.icon}</div>
+              <div className="font-['Tiro_Bangla'] text-[1.2rem] text-slate-900 mb-2.5">{r.title}</div>
+              <p className="text-[.875rem] leading-7 text-slate-500">{r.desc}</p>
+              <div className={`absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r ${theme.accentFrom} ${theme.accentTo} via-transparent
+                scale-x-0 origin-left transition-transform duration-400 group-hover:scale-x-100 rounded-b-2xl`} />
+            </div>
+          )
+        })}
       </div>
     </section>
   )

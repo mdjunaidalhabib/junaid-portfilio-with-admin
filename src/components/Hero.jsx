@@ -1,23 +1,23 @@
 import { useEffect, useState } from 'react'
-import { FaPhoneAlt, FaMapMarkerAlt, FaEnvelope, FaDownload, FaPaperPlane, FaFacebook, FaWhatsapp } from 'react-icons/fa'
+import { FaPhoneAlt, FaMapMarkerAlt, FaEnvelope, FaDownload, FaPaperPlane } from 'react-icons/fa'
 import { usePortfolioData } from '../data/PortfolioDataContext'
-import { BRAND, CONTACT_COLORS } from '../data/brandColors'
+import { BRAND, CONTACT_COLORS, PLATFORM_ICONS, detectPlatform } from '../data/brandColors'
+import { telHref, whatsappHref } from '../lib/phone'
 
 export default function Hero() {
   const { personalInfo, contactInfo, socialLinks } = usePortfolioData()
+  const facebookLink = socialLinks.find(s => detectPlatform(s.href) === 'facebook')
   const heroSocials = [
-    { label: 'ফেসবুক',       platform: 'facebook',  href: socialLinks.find(s => s.platform === 'fb_id')?.href || '#' },
-    { label: 'হোয়াটসঅ্যাপ', platform: 'whatsapp',  href: contactInfo.whatsapp },
+    { label: 'ফেসবুক',       platform: 'facebook', href: facebookLink?.href || '#' },
+    { label: 'হোয়াটসঅ্যাপ', platform: 'whatsapp', href: whatsappHref(contactInfo.whatsapp) },
   ]
   const [vis, setVis] = useState(false)
   const [imgError, setImgError] = useState(false)
 
   useEffect(() => { setTimeout(() => setVis(true), 100) }, [])
 
-  const iconMap = { facebook: <FaFacebook size={15} />, whatsapp: <FaWhatsapp size={15} /> }
-
   const directContacts = [
-    { icon: <FaPhoneAlt size={12} />,     label: contactInfo.phone,    href: contactInfo.phoneTel, key: 'phone' },
+    { icon: <FaPhoneAlt size={12} />,     label: contactInfo.phone,    href: telHref(contactInfo.phone), key: 'phone' },
     { icon: <FaMapMarkerAlt size={13} />, label: contactInfo.location,                              key: 'location' },
     { icon: <FaEnvelope size={12} />,     label: contactInfo.email,    href: `mailto:${contactInfo.email}`, key: 'mail' },
   ]
@@ -101,6 +101,7 @@ export default function Hero() {
             <div className="flex items-center gap-2 mb-6">
               {heroSocials.map(({ label, platform, href }) => {
                 const b = BRAND[platform]
+                const Icon = PLATFORM_ICONS[platform]
                 return (
                   <a key={label} href={href} aria-label={label}
                     className="w-[42px] h-[42px] rounded-full border-[1.5px] flex items-center justify-center
@@ -108,7 +109,7 @@ export default function Hero() {
                     style={{ borderColor: b.border, background: b.bg, color: b.color }}
                     onMouseOver={e => { e.currentTarget.style.background = b.color; e.currentTarget.style.color = '#fff'; e.currentTarget.style.boxShadow = `0 8px 20px ${b.border}` }}
                     onMouseOut={e => { e.currentTarget.style.background = b.bg; e.currentTarget.style.color = b.color; e.currentTarget.style.boxShadow = 'none' }}>
-                    {iconMap[platform]}
+                    <Icon size={15} />
                   </a>
                 )
               })}

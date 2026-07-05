@@ -2,12 +2,47 @@
 //  brandColors.js — সামাজিক মাধ্যম আইকনের নিজস্ব (brand) রঙ
 //  Footer, Hero, Contact — সব জায়গায় এই একই রঙ ব্যবহার হয়
 // ============================================================
+import { FaFacebook, FaYoutube, FaTelegram, FaWhatsapp, FaTwitter, FaInstagram, FaLinkedin, FaTiktok, FaGlobe, FaEnvelope } from 'react-icons/fa'
+
 export const BRAND = {
-  facebook: { color: '#1877F2', bg: 'rgba(24,119,242,.09)',  border: 'rgba(24,119,242,.24)' },
-  whatsapp: { color: '#25D366', bg: 'rgba(37,211,102,.09)',  border: 'rgba(37,211,102,.24)' },
-  youtube:  { color: '#FF0000', bg: 'rgba(255,0,0,.08)',     border: 'rgba(255,0,0,.22)'   },
-  telegram: { color: '#26A5E4', bg: 'rgba(38,165,228,.09)',  border: 'rgba(38,165,228,.24)' },
-  email:    { color: '#16a34a', bg: 'rgba(22,163,74,.08)',   border: 'rgba(22,163,74,.22)'  },
+  facebook:  { color: '#1877F2', bg: 'rgba(24,119,242,.09)', border: 'rgba(24,119,242,.24)' },
+  whatsapp:  { color: '#25D366', bg: 'rgba(37,211,102,.09)', border: 'rgba(37,211,102,.24)' },
+  youtube:   { color: '#FF0000', bg: 'rgba(255,0,0,.08)',    border: 'rgba(255,0,0,.22)'   },
+  telegram:  { color: '#26A5E4', bg: 'rgba(38,165,228,.09)', border: 'rgba(38,165,228,.24)' },
+  twitter:   { color: '#000000', bg: 'rgba(0,0,0,.06)',      border: 'rgba(0,0,0,.18)'      },
+  instagram: { color: '#E1306C', bg: 'rgba(225,48,108,.09)', border: 'rgba(225,48,108,.24)'  },
+  linkedin:  { color: '#0A66C2', bg: 'rgba(10,102,194,.09)', border: 'rgba(10,102,194,.24)'  },
+  tiktok:    { color: '#000000', bg: 'rgba(0,0,0,.06)',      border: 'rgba(0,0,0,.18)'      },
+  email:     { color: '#16a34a', bg: 'rgba(22,163,74,.08)',  border: 'rgba(22,163,74,.22)'  },
+  website:   { color: '#475569', bg: 'rgba(71,85,105,.08)',  border: 'rgba(71,85,105,.22)'  },
+}
+
+// লিংক (href) দেখে স্বয়ংক্রিয়ভাবে প্ল্যাটফর্ম শনাক্ত করে — এডমিন থেকে
+// আর আলাদা করে "প্ল্যাটফর্ম" ফিল্ড বেছে নেওয়ার দরকার নেই, শুধু লিংক দিলেই হবে।
+export function detectPlatform(href) {
+  const h = (href || '').toLowerCase()
+  if (h.includes('facebook.com') || h.includes('fb.com') || h.includes('fb.me')) return 'facebook'
+  if (h.includes('wa.me') || h.includes('whatsapp.com')) return 'whatsapp'
+  if (h.includes('youtube.com') || h.includes('youtu.be')) return 'youtube'
+  if (h.includes('t.me') || h.includes('telegram')) return 'telegram'
+  if (h.includes('twitter.com') || h.includes('x.com')) return 'twitter'
+  if (h.includes('instagram.com')) return 'instagram'
+  if (h.includes('linkedin.com')) return 'linkedin'
+  if (h.includes('tiktok.com')) return 'tiktok'
+  return 'website'
+}
+
+export const PLATFORM_ICONS = {
+  facebook:  FaFacebook,
+  whatsapp:  FaWhatsapp,
+  youtube:   FaYoutube,
+  telegram:  FaTelegram,
+  twitter:   FaTwitter,
+  instagram: FaInstagram,
+  linkedin:  FaLinkedin,
+  tiktok:    FaTiktok,
+  website:   FaGlobe,
+  email:     FaEnvelope,
 }
 
 // প্রত্যক্ষ যোগাযোগ (ফোন/ইমেইল/লোকেশন) — বাস্তব জগতের পরিচিত রঙ

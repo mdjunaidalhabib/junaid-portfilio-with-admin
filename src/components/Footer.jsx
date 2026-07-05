@@ -1,15 +1,16 @@
-import { FaFacebook, FaYoutube, FaWhatsapp, FaEnvelope } from 'react-icons/fa'
 import { usePortfolioData } from '../data/PortfolioDataContext'
-import { BRAND } from '../data/brandColors'
+import { BRAND, PLATFORM_ICONS, detectPlatform } from '../data/brandColors'
+import { whatsappHref } from '../lib/phone'
 
 export default function Footer() {
   const { personalInfo, contactInfo, socialLinks, footerDua } = usePortfolioData()
   const footerIcons = [
-    { label: 'ফেসবুক',       platform: 'facebook', icon: <FaFacebook size={16} />, href: socialLinks.find(s => s.platform === 'fb_page')?.href || '#' },
-    { label: 'ইউটিউব',       platform: 'youtube',  icon: <FaYoutube size={16} />,  href: socialLinks.find(s => s.platform === 'youtube')?.href  || '#' },
-    { label: 'হোয়াটসঅ্যাপ', platform: 'whatsapp', icon: <FaWhatsapp size={16} />, href: contactInfo.whatsapp },
-    { label: 'ইমেইল',        platform: 'email',    icon: <FaEnvelope size={16} />, href: `mailto:${contactInfo.email}` },
+    { label: 'ফেসবুক',       platform: 'facebook', href: socialLinks.find(s => detectPlatform(s.href) === 'facebook')?.href || '#' },
+    { label: 'ইউটিউব',       platform: 'youtube',  href: socialLinks.find(s => detectPlatform(s.href) === 'youtube')?.href  || '#' },
+    { label: 'হোয়াটসঅ্যাপ', platform: 'whatsapp', href: whatsappHref(contactInfo.whatsapp) },
+    { label: 'ইমেইল',        platform: 'email',    href: `mailto:${contactInfo.email}` },
   ]
+  const copyrightText = `© ${new Date().getFullYear()} ${personalInfo.name} · সর্বস্বত্ব সংরক্ষিত`
   return (
     <footer className="bg-gradient-to-b from-green-50 to-green-100">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-14 text-center">
@@ -37,6 +38,7 @@ export default function Footer() {
         <div className="flex justify-center gap-3 mb-8">
           {footerIcons.map((s, i) => {
             const b = BRAND[s.platform]
+            const Icon = PLATFORM_ICONS[s.platform]
             return (
               <a key={i} href={s.href} aria-label={s.label}
                 className="w-[42px] h-[42px] rounded-full border-[1.5px] flex items-center justify-center
@@ -44,7 +46,7 @@ export default function Footer() {
                 style={{ borderColor: b.border, background: b.bg, color: b.color }}
                 onMouseOver={e => { e.currentTarget.style.background = b.color; e.currentTarget.style.color = '#fff'; e.currentTarget.style.boxShadow = `0 8px 20px ${b.border}` }}
                 onMouseOut={e => { e.currentTarget.style.background = b.bg; e.currentTarget.style.color = b.color; e.currentTarget.style.boxShadow = 'none' }}>
-                {s.icon}
+                <Icon size={16} />
               </a>
             )
           })}
@@ -57,7 +59,7 @@ export default function Footer() {
           <div className="w-10 h-px bg-gradient-to-l from-transparent to-green-400/35" />
         </div>
 
-        <div className="text-[.78rem] text-slate-400">{personalInfo.copyright}</div>
+        <div className="text-[.78rem] text-slate-400">{copyrightText}</div>
       </div>
     </footer>
   )

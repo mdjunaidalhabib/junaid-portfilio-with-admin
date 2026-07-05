@@ -1,28 +1,15 @@
 import { useReveal } from '../hooks/useReveal'
-import { FaEnvelope, FaPhone, FaMapMarker, FaFacebook, FaYoutube, FaTelegram } from 'react-icons/fa'
+import { FaEnvelope, FaPhone, FaMapMarker } from 'react-icons/fa'
 import { usePortfolioData } from '../data/PortfolioDataContext'
-import { BRAND, CONTACT_COLORS } from '../data/brandColors'
-
-const iconMap = {
-  fb_id:    <FaFacebook size={16} />,
-  fb_page:  <FaFacebook size={16} />,
-  youtube:  <FaYoutube size={16} />,
-  telegram: <FaTelegram size={16} />,
-}
-
-const BRAND_KEY = {
-  fb_id:    'facebook',
-  fb_page:  'facebook',
-  youtube:  'youtube',
-  telegram: 'telegram',
-}
+import { BRAND, CONTACT_COLORS, PLATFORM_ICONS, detectPlatform } from '../data/brandColors'
+import { telHref } from '../lib/phone'
 
 export default function Contact() {
   const { contactInfo, socialLinks } = usePortfolioData()
   const ref = useReveal()
 
   const directContacts = [
-    { icon: <FaPhone size={14} />,     label: 'মোবাইল', value: contactInfo.phone,    href: contactInfo.phoneTel, key: 'phone' },
+    { icon: <FaPhone size={14} />,     label: 'মোবাইল', value: contactInfo.phone,    href: telHref(contactInfo.phone), key: 'phone' },
     { icon: <FaEnvelope size={14} />,  label: 'ইমেইল',  value: contactInfo.email,    href: `mailto:${contactInfo.email}`, key: 'mail' },
     { icon: <FaMapMarker size={14} />, label: 'ঠিকানা', value: contactInfo.location,                              key: 'location' },
   ]
@@ -78,7 +65,9 @@ export default function Contact() {
           <div className="font-['Tiro_Bangla'] text-[1.1rem] text-slate-900 font-semibold mb-5">সামাজিক মাধ্যম</div>
           <div className="flex flex-col gap-3">
             {socialLinks.map(s => {
-              const b = BRAND[BRAND_KEY[s.platform]] || BRAND.facebook
+              const platform = detectPlatform(s.href)
+              const b = BRAND[platform]
+              const Icon = PLATFORM_ICONS[platform]
               return (
                 <a key={s.label} href={s.href}
                   className="flex items-center gap-3 px-3.5 py-3 border rounded-[11px] no-underline
@@ -86,7 +75,7 @@ export default function Contact() {
                   style={{ borderColor: 'rgba(15,23,42,.08)' }}
                   onMouseOver={e => { e.currentTarget.style.borderColor = b.border; e.currentTarget.style.background = b.bg }}
                   onMouseOut={e => { e.currentTarget.style.borderColor = 'rgba(15,23,42,.08)'; e.currentTarget.style.background = '' }}>
-                  <span className="text-[1.1rem] flex-shrink-0" style={{ color: b.color }}>{iconMap[s.platform]}</span>
+                  <span className="text-[1.1rem] flex-shrink-0" style={{ color: b.color }}><Icon size={16} /></span>
                   <span className="text-[.9rem] font-medium">{s.label}</span>
                   <span className="ml-auto opacity-35 text-[.9rem]">→</span>
                 </a>

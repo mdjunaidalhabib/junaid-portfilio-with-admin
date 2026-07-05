@@ -65,12 +65,36 @@ export default function AdminPanel({ onLogout }) {
 
       if (saved && type === 'object' && base && typeof base === 'object' && !Array.isArray(base)) {
         // পুরনো সেভ করা ডেটায় নতুন যুক্ত হওয়া ফিল্ড (যেমন cvUrl) না থাকলে
-        // ডিফল্ট থেকে সেটা যুক্ত করে দেয়, যাতে সেটা এডমিন প্যানেলে দেখা যায়
-        merged[key] = { ...base, ...saved }
+        // ডিফল্ট থেকে সেটা যুক্ত করে দেয়। আর যেসব ফিল্ড আর ব্যবহার হয় না
+        // (যেমন phoneTel, copyright) সেগুলো পুরনো ডেটায় থাকলেও বাদ পড়ে যায়,
+        // ফলে এডমিন প্যানেলে অপ্রয়োজনীয় ফিল্ড আর দেখা যাবে না।
+        merged[key] = { ...base }
+        Object.keys(base).forEach((field) => {
+          if (saved[field] !== undefined) merged[key][field] = saved[field]
+        })
       } else {
         merged[key] = saved || base
       }
     })
+
+    // অ্যারে-টাইপ সেকশনের প্রতিটা আইটেমকে বর্তমান ডিফল্ট শেপের সাথে মিলিয়ে নেয় —
+    // এতে করে কোনো আইটেমে নতুন ফিল্ড (যেমন সব শিক্ষাজীবনে "badge") না থাকলে
+    // সেটা খালি মান দিয়ে যোগ হয়ে যায়, আবার পুরনো অপ্রয়োজনীয় ফিল্ড (highlight,
+    // platform, accentFrom, hoverBg ইত্যাদি) থাকলে বাদ পড়ে যায়
+    SECTIONS.forEach(({ key, type }) => {
+      const template = Array.isArray(defaults[key]) ? defaults[key][0] : null
+      if (type === 'array' && Array.isArray(merged[key]) && template && typeof template === 'object') {
+        const shapeKeys = Object.keys(template)
+        merged[key] = merged[key].map((item) => {
+          const normalized = {}
+          shapeKeys.forEach((field) => {
+            normalized[field] = item && item[field] !== undefined ? item[field] : template[field]
+          })
+          return normalized
+        })
+      }
+    })
+
     setContent(merged)
     setOriginal(JSON.parse(JSON.stringify(merged)))
     setLoading(false)
@@ -144,33 +168,14 @@ export default function AdminPanel({ onLogout }) {
 
           <main className="flex-1 p-4 sm:p-8 overflow-y-auto">
             <div className="max-w-2xl mx-auto">
-              <h2 className="text-lg font-semibold text-slate-800 mb-4">{activeSection.label}</h2>
+              <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
+                <h2 className="text-lg font-semibold text-slate-800">{activeSection.label}</h2>
 
-              {activeSection.type === 'account' ? (
-                <ChangePasswordForm />
-              ) : (
-                <>
-                  {activeSection.type === 'object' ? (
-                    <ObjectEditor
-                      sectionKey={activeKey}
-                      version={version}
-                      value={content[activeKey]}
-                      onChange={(v) => updateField(activeKey, v)}
-                      editingField={editingField}
-                      setEditingField={setEditingField}
-                    />
-                  ) : (
-                    <ArrayEditor
-                      sectionKey={activeKey}
-                      version={version}
-                      value={content[activeKey]}
-                      onChange={(v) => updateField(activeKey, v)}
-                      editingField={editingField}
-                      setEditingField={setEditingField}
-                    />
-                  )}
-
-                  <div className="mt-6 flex items-center gap-3">
+                {activeSection.type !== 'account' && (
+                  <div className="flex items-center gap-3">
+                    {!isDirty && !saving && (
+                      <span className="text-xs text-slate-400">কোনো পরিবর্তন করা হয়নি</span>
+                    )}
                     <button
                       onClick={() => saveSection(activeKey)}
                       disabled={saving || !isDirty}
@@ -182,11 +187,30 @@ export default function AdminPanel({ onLogout }) {
                     >
                       {saving ? 'আপডেট হচ্ছে...' : 'আপডেট করুন'}
                     </button>
-                    {!isDirty && !saving && (
-                      <span className="text-xs text-slate-400">কোনো পরিবর্তন করা হয়নি</span>
-                    )}
                   </div>
-                </>
+                )}
+              </div>
+
+              {activeSection.type === 'account' ? (
+                <ChangePasswordForm />
+              ) : activeSection.type === 'object' ? (
+                <ObjectEditor
+                  sectionKey={activeKey}
+                  version={version}
+                  value={content[activeKey]}
+                  onChange={(v) => updateField(activeKey, v)}
+                  editingField={editingField}
+                  setEditingField={setEditingField}
+                />
+              ) : (
+                <ArrayEditor
+                  sectionKey={activeKey}
+                  version={version}
+                  value={content[activeKey]}
+                  onChange={(v) => updateField(activeKey, v)}
+                  editingField={editingField}
+                  setEditingField={setEditingField}
+                />
               )}
             </div>
           </main>
@@ -194,6 +218,14 @@ export default function AdminPanel({ onLogout }) {
       )}
     </div>
   )
+}
+
+// contactInfo ফিল্ডের জন্য বাংলা লেবেল ও সহায়ক টেক্সট
+const CONTACT_FIELD_META = {
+  phone:    { label: 'মোবাইল নাম্বার',            hint: 'যেমন: 01624-114405 — শুধু নাম্বার দিন, বাকিটা (কল লিংক) অটোমেটিক তৈরি হবে' },
+  whatsapp: { label: 'হোয়াটসঅ্যাপ নাম্বার',        hint: 'শুধু নাম্বার দিন (+৮৮ ছাড়া), যেমন: 01624-114405 — লিংক অটোমেটিক তৈরি হবে' },
+  email:    { label: 'ইমেইল',                     hint: '' },
+  location: { label: 'ঠিকানা',                    hint: '' },
 }
 
 // ── অবজেক্ট (key: value) এডিটর ───────────────────────────────
@@ -208,6 +240,22 @@ function ObjectEditor({ sectionKey, version, value, onChange, editingField, setE
   return (
     <div className="space-y-4 bg-white rounded-lg p-4 sm:p-5 shadow-sm">
       {entries.map(([field, val]) => {
+        if (sectionKey === 'contactInfo' && CONTACT_FIELD_META[field]) {
+          const meta = CONTACT_FIELD_META[field]
+          return (
+            <div key={`${sectionKey}-${field}-${version}`}>
+              <FieldInput
+                fieldId={`${sectionKey}-${field}`}
+                editingField={editingField}
+                setEditingField={setEditingField}
+                label={meta.label}
+                value={val}
+                onChange={(v) => setField(field, v)}
+              />
+              {meta.hint && <p className="text-[.7rem] text-slate-400 mt-1">{meta.hint}</p>}
+            </div>
+          )
+        }
         if (sectionKey === 'personalInfo' && field === 'profileImage') {
           return (
             <ImageUploadField
@@ -353,6 +401,11 @@ function PdfUploadField({ value, onChange }) {
   )
 }
 
+// অ্যারে-আইটেমের কিছু ইংরেজি ফিল্ড-কী-এর জন্য বাংলা লেবেল
+const ARRAY_FIELD_LABELS = {
+  socialLinks: { label: 'নাম', href: 'লিংক' },
+}
+
 // ── অ্যারে (লিস্ট অফ অবজেক্ট/স্ট্রিং) এডিটর ─────────────────
 function ArrayEditor({ sectionKey, version, value, onChange, editingField, setEditingField }) {
   if (!Array.isArray(value)) return null
@@ -394,7 +447,7 @@ function ArrayEditor({ sectionKey, version, value, onChange, editingField, setEd
                   fieldId={`${sectionKey}-${idx}-${field}`}
                   editingField={editingField}
                   setEditingField={setEditingField}
-                  label={field}
+                  label={ARRAY_FIELD_LABELS[sectionKey]?.[field] || field}
                   value={val}
                   onChange={(v) => updateItem(idx, { ...item, [field]: v })}
                 />
@@ -540,24 +593,115 @@ function FieldInput({ fieldId, editingField, setEditingField, label, value, onCh
 }
 
 // ── পাসওয়ার্ড পরিবর্তন (লগইন করা অবস্থায়) ───────────────────
+// প্রফেশনাল সিস্টেম: আগে বর্তমান পাসওয়ার্ড যাচাই করা হয়, তারপর নতুন
+// পাসওয়ার্ডের জন্য ন্যূনতম শক্তি (দৈর্ঘ্য + অক্ষর + সংখ্যা) বাধ্যতামূলক করা হয়
+function passwordStrength(pw) {
+  if (!pw) return { score: 0, label: '', color: 'bg-slate-200' }
+  let score = 0
+  if (pw.length >= 8) score++
+  if (pw.length >= 12) score++
+  if (/[a-z]/.test(pw) && /[A-Z]/.test(pw)) score++
+  if (/\d/.test(pw)) score++
+  if (/[^A-Za-z0-9]/.test(pw)) score++
+  const levels = [
+    { label: 'দুর্বল',       color: 'bg-red-500' },
+    { label: 'দুর্বল',       color: 'bg-red-500' },
+    { label: 'মোটামুটি',     color: 'bg-yellow-500' },
+    { label: 'ভালো',        color: 'bg-green-500' },
+    { label: 'শক্তিশালী',    color: 'bg-green-600' },
+    { label: 'শক্তিশালী',    color: 'bg-green-600' },
+  ]
+  return { score, ...levels[score] }
+}
+
+function PasswordField({ label, value, onChange, show, onToggleShow, autoComplete, hint, error }) {
+  return (
+    <div>
+      <label className="block text-xs text-slate-500 mb-1">{label}</label>
+      <div className="relative">
+        <input
+          type={show ? 'text' : 'password'}
+          required
+          autoComplete={autoComplete}
+          value={value}
+          onChange={onChange}
+          className={`w-full border rounded-md px-3 py-2 pr-10 text-sm focus:outline-none focus:ring-2
+            ${error ? 'border-red-400 focus:ring-red-400' : 'border-slate-300 focus:ring-green-500'}`}
+        />
+        <button
+          type="button"
+          onClick={onToggleShow}
+          tabIndex={-1}
+          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+        >
+          {show ? <EyeOff size={18} /> : <Eye size={18} />}
+        </button>
+      </div>
+      {error ? (
+        <p className="text-[.72rem] text-red-500 mt-1">{error}</p>
+      ) : hint ? (
+        <p className="text-[.72rem] text-slate-400 mt-1">{hint}</p>
+      ) : null}
+    </div>
+  )
+}
+
 function ChangePasswordForm() {
   const toast = useToast()
+  const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
+  const [showCurrent, setShowCurrent] = useState(false)
+  const [showNew, setShowNew] = useState(false)
   const [saving, setSaving] = useState(false)
+
+  const strength = passwordStrength(newPassword)
+  const meetsLength = newPassword.length >= 8
+  const meetsLetter = /[a-z]/i.test(newPassword)
+  const meetsNumber = /\d/.test(newPassword)
+  const isStrongEnough = meetsLength && meetsLetter && meetsNumber
+  const confirmError = confirmPassword && confirmPassword !== newPassword ? 'দুইটা পাসওয়ার্ড মিলছে না' : ''
+  const sameAsOldError = newPassword && currentPassword && newPassword === currentPassword
+    ? 'নতুন পাসওয়ার্ড বর্তমান পাসওয়ার্ডের থেকে ভিন্ন হতে হবে' : ''
+
+  const canSubmit = currentPassword.length > 0 && isStrongEnough && confirmPassword === newPassword && !sameAsOldError
 
   async function handleSubmit(e) {
     e.preventDefault()
-    if (newPassword.length < 6) {
-      toast.error('পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।')
+    if (!isStrongEnough) {
+      toast.error('পাসওয়ার্ড কমপক্ষে ৮ অক্ষরের হতে হবে এবং অক্ষর ও সংখ্যা থাকতে হবে।')
       return
     }
     if (newPassword !== confirmPassword) {
       toast.error('দুইটা পাসওয়ার্ড মিলছে না।')
       return
     }
+    if (sameAsOldError) {
+      toast.error(sameAsOldError)
+      return
+    }
+
     setSaving(true)
+
+    // ধাপ ১: বর্তমান পাসওয়ার্ড সঠিক কিনা যাচাই — এটা ছাড়া কেউ সেশন খোলা
+    // থাকা অবস্থায় (যেমন অন্য কারো কম্পিউটারে লগইন করা থাকলে) সরাসরি
+    // পাসওয়ার্ড বদলে দিতে পারবে না
+    const { data: userData } = await supabase.auth.getUser()
+    const email = userData?.user?.email
+    if (!email) {
+      setSaving(false)
+      toast.error('ব্যবহারকারীর তথ্য পাওয়া যায়নি, আবার লগইন করুন।')
+      return
+    }
+
+    const { error: verifyError } = await supabase.auth.signInWithPassword({ email, password: currentPassword })
+    if (verifyError) {
+      setSaving(false)
+      toast.error('বর্তমান পাসওয়ার্ড সঠিক নয়।')
+      return
+    }
+
+    // ধাপ ২: যাচাই সফল হলে তবেই নতুন পাসওয়ার্ড সেট হবে
     const { error } = await supabase.auth.updateUser({ password: newPassword })
     setSaving(false)
     if (error) {
@@ -565,48 +709,70 @@ function ChangePasswordForm() {
       return
     }
     toast.success('পাসওয়ার্ড সফলভাবে পরিবর্তন হয়েছে ✓')
+    setCurrentPassword('')
     setNewPassword('')
     setConfirmPassword('')
   }
 
   return (
     <form onSubmit={handleSubmit} className="bg-white rounded-lg p-4 sm:p-5 shadow-sm max-w-sm space-y-4">
-      <div>
-        <label className="block text-xs text-slate-500 mb-1">নতুন পাসওয়ার্ড</label>
-        <div className="relative">
-          <input
-            type={showPassword ? 'text' : 'password'}
-            required
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            className="w-full border border-slate-300 rounded-md px-3 py-2 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-          />
-          <button
-            type="button"
-            onClick={() => setShowPassword((v) => !v)}
-            tabIndex={-1}
-            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-          >
-            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-          </button>
-        </div>
-      </div>
+      <PasswordField
+        label="বর্তমান পাসওয়ার্ড"
+        value={currentPassword}
+        onChange={(e) => setCurrentPassword(e.target.value)}
+        show={showCurrent}
+        onToggleShow={() => setShowCurrent((v) => !v)}
+        autoComplete="current-password"
+        hint="নিরাপত্তার জন্য প্রথমে আপনার বর্তমান পাসওয়ার্ড দিন"
+      />
 
       <div>
-        <label className="block text-xs text-slate-500 mb-1">নতুন পাসওয়ার্ড আবার দিন</label>
-        <input
-          type={showPassword ? 'text' : 'password'}
-          required
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+        <PasswordField
+          label="নতুন পাসওয়ার্ড"
+          value={newPassword}
+          onChange={(e) => setNewPassword(e.target.value)}
+          show={showNew}
+          onToggleShow={() => setShowNew((v) => !v)}
+          autoComplete="new-password"
+          error={sameAsOldError}
         />
+        {newPassword && (
+          <div className="mt-2">
+            <div className="flex gap-1">
+              {[0, 1, 2, 3, 4].map((i) => (
+                <div key={i} className={`h-1 flex-1 rounded-full ${i < strength.score ? strength.color : 'bg-slate-200'}`} />
+              ))}
+            </div>
+            <p className="text-[.72rem] text-slate-400 mt-1">
+              পাসওয়ার্ডের শক্তি: <span className="font-medium">{strength.label}</span>
+            </p>
+          </div>
+        )}
+        <ul className="mt-2 space-y-0.5 text-[.72rem]">
+          <li className={meetsLength ? 'text-green-600' : 'text-slate-400'}>✓ কমপক্ষে ৮ অক্ষর</li>
+          <li className={meetsLetter ? 'text-green-600' : 'text-slate-400'}>✓ অন্তত একটি অক্ষর</li>
+          <li className={meetsNumber ? 'text-green-600' : 'text-slate-400'}>✓ অন্তত একটি সংখ্যা</li>
+        </ul>
       </div>
+
+      <PasswordField
+        label="নতুন পাসওয়ার্ড আবার দিন"
+        value={confirmPassword}
+        onChange={(e) => setConfirmPassword(e.target.value)}
+        show={showNew}
+        onToggleShow={() => setShowNew((v) => !v)}
+        autoComplete="new-password"
+        error={confirmError}
+      />
 
       <button
         type="submit"
-        disabled={saving}
-        className="bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-md px-5 py-2 disabled:opacity-60"
+        disabled={saving || !canSubmit}
+        className={`text-sm font-medium rounded-md px-5 py-2 w-full transition-colors ${
+          canSubmit && !saving
+            ? 'bg-green-600 hover:bg-green-700 text-white'
+            : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+        }`}
       >
         {saving ? 'সেভ হচ্ছে...' : 'পাসওয়ার্ড পরিবর্তন করুন'}
       </button>

@@ -4,13 +4,17 @@ import { usePortfolioData } from '../data/PortfolioDataContext'
 export default function Stats() {
   const { stats } = usePortfolioData()
   const [counts, setCounts] = useState(stats.map(() => 0))
-  const [started, setStarted] = useState(false)
   const ref = useRef(null)
 
+  // stats ডেটা (ডেমো থেকে আসল ডেটায়) পরিবর্তন হলে কাউন্টার নতুন করে
+  // সঠিক মান পর্যন্ত গণনা করবে — আগে এটা পুরনো (stale) মান ধরে রাখতো
+  // এবং Supabase থেকে আসল ডেটা লোড হওয়ার পরও ০-তেই আটকে থাকতো
   useEffect(() => {
+    setCounts(stats.map(() => 0))
+    let hasStarted = false
     const obs = new IntersectionObserver(([e]) => {
-      if (e.isIntersecting && !started) {
-        setStarted(true)
+      if (e.isIntersecting && !hasStarted) {
+        hasStarted = true
         stats.forEach((s, i) => {
           let v = 0
           const step = Math.max(1, Math.ceil(s.val / 90))
@@ -24,7 +28,7 @@ export default function Stats() {
     }, { threshold: .3 })
     if (ref.current) obs.observe(ref.current)
     return () => obs.disconnect()
-  }, [started])
+  }, [stats])
 
   return (
     <div ref={ref} className="bg-gradient-to-br from-green-50 to-slate-50 border-t border-green-500/10 border-b border-green-500/8">
