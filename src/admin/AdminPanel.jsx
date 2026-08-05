@@ -3,7 +3,7 @@ import {
   Eye, EyeOff, Pencil, Check, LogOut, LayoutDashboard,
   User, Phone, Share2, Menu, BarChart3, GraduationCap,
   Briefcase, BookOpen, Quote as QuoteIcon, MoonStar, KeyRound,
-  Image as ImageIcon, FileText, UploadCloud, Loader2,
+  Image as ImageIcon, FileText, UploadCloud, Loader2, ToggleLeft,
 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { uploadAsset } from '../lib/storage'
@@ -21,6 +21,7 @@ const SECTION_ICONS = {
   writings: BookOpen,
   quote: QuoteIcon,
   footerDua: MoonStar,
+  sectionVisibility: ToggleLeft,
   account: KeyRound,
 }
 
@@ -35,8 +36,33 @@ const SECTIONS = [
   { key: 'writings', label: 'লেখালেখি / বই', type: 'array' },
   { key: 'quote', label: 'অনুপ্রেরণামূলক উক্তি', type: 'object' },
   { key: 'footerDua', label: 'ফুটারের আরবি দোয়া', type: 'object' },
+  { key: 'sectionVisibility', label: 'সেকশন দৃশ্যমানতা', type: 'visibility' },
   { key: 'account', label: 'পাসওয়ার্ড পরিবর্তন', type: 'account' },
 ]
+
+const SECTION_VISIBILITY_LABELS = {
+  stats:     { label: 'পরিসংখ্যান',            hint: 'অভিজ্ঞতা, রচনা, বই, ছাত্র-ছাত্রীর সংখ্যার বার' },
+  about:     { label: 'পরিচিতি',               hint: '"আমার সম্পর্কে" সেকশন' },
+  education: { label: 'শিক্ষাগত যোগ্যতা',       hint: 'মাদরাসা ও সাধারণ শিক্ষা' },
+  roles:     { label: 'কর্মক্ষেত্র ও দায়িত্ব', hint: '' },
+  writings:  { label: 'লেখালেখি / বই',          hint: '' },
+  quote:     { label: 'অনুপ্রেরণামূলক উক্তি',    hint: '' },
+  contact:   { label: 'যোগাযোগ',                hint: 'ফোন, ইমেইল ও সামাজিক মাধ্যম' },
+}
+
+// এডমিনের কোন ট্যাব কোন সেকশন-দৃশ্যমানতা কী নিয়ন্ত্রণ করে — এই ম্যাপ
+// অনুযায়ী প্রতিটা সংশ্লিষ্ট ট্যাবের উপরেই একটা চালু/বন্ধ সুইচ দেখানো হয়,
+// যাতে আলাদা "সেকশন দৃশ্যমানতা" ট্যাব খুঁজে বের করতে না হয়
+const VISIBILITY_MAP = {
+  personalInfo: 'about',
+  contactInfo: 'contact',
+  socialLinks: 'contact',
+  stats: 'stats',
+  educations: 'education',
+  roles: 'roles',
+  writings: 'writings',
+  quote: 'quote',
+}
 
 const TABLE = 'portfolio_content'
 
@@ -63,7 +89,7 @@ export default function AdminPanel({ onLogout }) {
       const saved = row ? row.content : null
       const base = defaults[key]
 
-      if (saved && type === 'object' && base && typeof base === 'object' && !Array.isArray(base)) {
+      if (saved && (type === 'object' || type === 'visibility') && base && typeof base === 'object' && !Array.isArray(base)) {
         // পুরনো সেভ করা ডেটায় নতুন যুক্ত হওয়া ফিল্ড (যেমন cvUrl) না থাকলে
         // ডিফল্ট থেকে সেটা যুক্ত করে দেয়। আর যেসব ফিল্ড আর ব্যবহার হয় না
         // (যেমন phoneTel, copyright) সেগুলো পুরনো ডেটায় থাকলেও বাদ পড়ে যায়,
@@ -120,8 +146,29 @@ export default function AdminPanel({ onLogout }) {
     setEditingField(null)
   }
 
+  // সেকশন চালু/বন্ধ — অন্যান্য ফিল্ডের মতো "আপডেট করুন" চাপার অপেক্ষা না
+  // করে সাথে সাথেই সেভ হয়ে যায় (এটা আলাদা section_key: 'sectionVisibility'
+  // রো-তে থাকে, তাই বর্তমান ট্যাবের সেভ বাটনের সাথে এটা জড়িত নয়)
+  async function toggleSectionVisibility(visKey) {
+    const current = content.sectionVisibility || {}
+    const next = { ...current, [visKey]: !current[visKey] }
+    setContent((prev) => ({ ...prev, sectionVisibility: next }))
+    const { error } = await supabase
+      .from(TABLE)
+      .upsert({ section_key: 'sectionVisibility', content: next }, { onConflict: 'section_key' })
+    if (error) {
+      setContent((prev) => ({ ...prev, sectionVisibility: current })) // ব্যর্থ হলে আগের অবস্থায় ফিরিয়ে নেয়
+      toast.error('সেভ করতে সমস্যা হয়েছে: ' + error.message)
+      return
+    }
+    setOriginal((prev) => ({ ...prev, sectionVisibility: JSON.parse(JSON.stringify(next)) }))
+    toast.success(next[visKey] ? 'সেকশনটি সাইটে দেখানো হচ্ছে ✓' : 'সেকশনটি সাইট থেকে লুকানো হয়েছে')
+  }
+
   const activeSection = SECTIONS.find((s) => s.key === activeKey)
   const isDirty = JSON.stringify(content[activeKey]) !== JSON.stringify(original[activeKey])
+  const activeVisKey = VISIBILITY_MAP[activeKey]
+  const activeVisOn = activeVisKey ? !!(content.sectionVisibility || {})[activeVisKey] : true
 
   return (
     <div className="min-h-screen bg-slate-100 flex flex-col">
@@ -168,10 +215,34 @@ export default function AdminPanel({ onLogout }) {
 
           <main className="flex-1 p-4 sm:p-8 overflow-y-auto">
             <div className="max-w-2xl mx-auto">
-              <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
-                <h2 className="text-lg font-semibold text-slate-800">{activeSection.label}</h2>
+              <div className="flex items-center justify-between gap-3 mb-2 flex-wrap">
+                <div className="flex items-center gap-3">
+                  <h2 className="text-lg font-semibold text-slate-800">{activeSection.label}</h2>
+                  {activeVisKey && (
+                    <button
+                      type="button"
+                      role="switch"
+                      aria-checked={activeVisOn}
+                      onClick={() => toggleSectionVisibility(activeVisKey)}
+                      title={
+                        (activeVisOn ? 'সাইটে দেখানো হচ্ছে — বন্ধ করতে চাপুন। ' : 'সাইটে লুকানো আছে — চালু করতে চাপুন। ') +
+                        (SECTION_VISIBILITY_LABELS[activeVisKey]?.hint || `"${SECTION_VISIBILITY_LABELS[activeVisKey]?.label || ''}" সেকশন নিয়ন্ত্রণ করে`)
+                      }
+                      className={`flex items-center gap-1.5 text-xs font-medium rounded-full pl-1 pr-2.5 py-1 border transition-colors ${
+                        activeVisOn
+                          ? 'bg-green-50 border-green-200 text-green-700'
+                          : 'bg-slate-100 border-slate-300 text-slate-500'
+                      }`}
+                    >
+                      <span className={`relative inline-flex h-4 w-7 items-center rounded-full transition-colors ${activeVisOn ? 'bg-green-600' : 'bg-slate-300'}`}>
+                        <span className={`inline-block h-3 w-3 transform rounded-full bg-white shadow-sm transition-transform ${activeVisOn ? 'translate-x-3.5' : 'translate-x-0.5'}`} />
+                      </span>
+                      {activeVisOn ? 'সাইটে দেখানো হচ্ছে' : 'সাইটে লুকানো আছে'}
+                    </button>
+                  )}
+                </div>
 
-                {activeSection.type !== 'account' && (
+                {activeSection.type !== 'account' && activeSection.type !== 'visibility' && (
                   <div className="flex items-center gap-3">
                     {!isDirty && !saving && (
                       <span className="text-xs text-slate-400">কোনো পরিবর্তন করা হয়নি</span>
@@ -191,8 +262,20 @@ export default function AdminPanel({ onLogout }) {
                 )}
               </div>
 
+              {activeVisKey && !activeVisOn && (
+                <div className="flex items-center gap-2 text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3.5 py-2.5 mb-4">
+                  <EyeOff size={14} className="flex-shrink-0" />
+                  "{SECTION_VISIBILITY_LABELS[activeVisKey]?.label}" সেকশনটি এখন সাইটে বন্ধ আছে — ভিজিটররা এটা দেখতে পাচ্ছেন না। এখানে যা পরিবর্তন করবেন তা সেভ হবে, তবে সাইটে দেখা যাবে উপরের সুইচ আবার চালু করলে।
+                </div>
+              )}
+
               {activeSection.type === 'account' ? (
                 <ChangePasswordForm />
+              ) : activeSection.type === 'visibility' ? (
+                <VisibilityEditor
+                  value={content[activeKey]}
+                  onToggle={toggleSectionVisibility}
+                />
               ) : activeSection.type === 'object' ? (
                 <ObjectEditor
                   sectionKey={activeKey}
@@ -286,6 +369,49 @@ function ObjectEditor({ sectionKey, version, value, onChange, editingField, setE
           />
         )
       })}
+    </div>
+  )
+}
+
+// ── সেকশন দৃশ্যমানতা (চালু/বন্ধ) ── বন্ধ করলে সেই সেকশন পাবলিক সাইটে
+// আর দেখা যাবে না, তবে ডেটা মুছে যাবে না — যেকোনো সময় আবার চালু করা যাবে
+function VisibilityEditor({ value, onToggle }) {
+  if (!value) return null
+
+  return (
+    <div className="bg-white rounded-lg p-4 sm:p-5 shadow-sm">
+      <p className="text-xs text-slate-400 mb-4">
+        সুইচ চাপা মাত্রই সাথে সাথে সেভ হয়ে যায় (আলাদা করে "আপডেট করুন" চাপতে হবে না) — বন্ধ করলে ডেটা মুছবে না, শুধু সেকশনটা সাইট থেকে লুকিয়ে যাবে।
+      </p>
+      <div className="divide-y divide-slate-100">
+        {Object.keys(value).map((key) => {
+          const meta = SECTION_VISIBILITY_LABELS[key] || { label: key, hint: '' }
+          const on = !!value[key]
+          return (
+            <div key={key} className="flex items-center justify-between gap-4 py-3.5 first:pt-0 last:pb-0">
+              <div>
+                <div className="text-sm font-medium text-slate-800">{meta.label}</div>
+                {meta.hint && <div className="text-[.72rem] text-slate-400 mt-0.5">{meta.hint}</div>}
+              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={on}
+                onClick={() => onToggle(key)}
+                className={`relative inline-flex flex-shrink-0 h-7 w-12 items-center rounded-full transition-colors duration-200 ${
+                  on ? 'bg-green-600' : 'bg-slate-300'
+                }`}
+              >
+                <span
+                  className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-sm transition-transform duration-200 ${
+                    on ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
+          )
+        })}
+      </div>
     </div>
   )
 }
@@ -404,6 +530,32 @@ function PdfUploadField({ value, onChange }) {
 // অ্যারে-আইটেমের কিছু ইংরেজি ফিল্ড-কী-এর জন্য বাংলা লেবেল
 const ARRAY_FIELD_LABELS = {
   socialLinks: { label: 'নাম', href: 'লিংক' },
+  educations: { year: 'সাল', degree: 'ডিগ্রি / সনদ', inst: 'প্রতিষ্ঠানের নাম', badge: 'ব্যাজ (ঐচ্ছিক)', category: 'ক্যাটাগরি' },
+  roles: { icon: 'আইকন (ইমোজি)', title: 'শিরোনাম', desc: 'বিবরণ' },
+  writings: { type: 'ধরন', title: 'শিরোনাম', sub: 'উপশিরোনাম', icon: 'আইকন (ইমোজি)', gold: 'বিশেষ (গোল্ড রঙ)', href: 'লিংক' },
+  stats: { val: 'সংখ্যা', suf: 'প্রত্যয় (যেমন +)', label: 'লেবেল', icon: 'আইকন (ইমোজি)' },
+}
+
+const EDUCATION_CATEGORIES = [
+  { value: 'madrasha', label: 'মাদরাসা শিক্ষা' },
+  { value: 'general',  label: 'সাধারণ শিক্ষা' },
+]
+
+function CategorySelect({ value, onChange }) {
+  return (
+    <div>
+      <label className="block text-xs text-slate-500 mb-1">ক্যাটাগরি</label>
+      <select
+        value={value || 'madrasha'}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-500"
+      >
+        {EDUCATION_CATEGORIES.map((c) => (
+          <option key={c.value} value={c.value}>{c.label}</option>
+        ))}
+      </select>
+    </div>
+  )
 }
 
 // ── অ্যারে (লিস্ট অফ অবজেক্ট/স্ট্রিং) এডিটর ─────────────────
@@ -441,17 +593,28 @@ function ArrayEditor({ sectionKey, version, value, onChange, editingField, setEd
           </button>
           {typeof item === 'object' ? (
             <div className="space-y-3 pr-14">
-              {Object.entries(item).map(([field, val]) => (
-                <FieldInput
-                  key={`${sectionKey}-${idx}-${field}-${version}`}
-                  fieldId={`${sectionKey}-${idx}-${field}`}
-                  editingField={editingField}
-                  setEditingField={setEditingField}
-                  label={ARRAY_FIELD_LABELS[sectionKey]?.[field] || field}
-                  value={val}
-                  onChange={(v) => updateItem(idx, { ...item, [field]: v })}
-                />
-              ))}
+              {Object.entries(item).map(([field, val]) => {
+                if (sectionKey === 'educations' && field === 'category') {
+                  return (
+                    <CategorySelect
+                      key={`${sectionKey}-${idx}-${field}-${version}`}
+                      value={val}
+                      onChange={(v) => updateItem(idx, { ...item, [field]: v })}
+                    />
+                  )
+                }
+                return (
+                  <FieldInput
+                    key={`${sectionKey}-${idx}-${field}-${version}`}
+                    fieldId={`${sectionKey}-${idx}-${field}`}
+                    editingField={editingField}
+                    setEditingField={setEditingField}
+                    label={ARRAY_FIELD_LABELS[sectionKey]?.[field] || field}
+                    value={val}
+                    onChange={(v) => updateItem(idx, { ...item, [field]: v })}
+                  />
+                )
+              })}
             </div>
           ) : (
             <div className="pr-14">

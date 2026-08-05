@@ -7,6 +7,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Tiro+Bangla:ital@0;1&family=Amiri:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet" />
+    <!-- হিরো সেকশনের প্রোফাইল ছবি (LCP এলিমেন্ট) আগে থেকেই ফেচ শুরু করে দেয়,
+         যাতে JS বান্ডল লোড/পার্স হওয়ার আগেই ছবিটা রেডি থাকে -->
+    <link rel="preload" as="image" href="/images/profile.webp" fetchpriority="high" />
   </head>
   <body>
     <div id="root"></div>

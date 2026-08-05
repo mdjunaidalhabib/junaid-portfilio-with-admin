@@ -23,11 +23,11 @@ export default function Roles() {
       </h2>
       <div className="h-0.5 w-10 bg-gradient-to-r from-green-400 to-transparent rounded mb-9" />
 
-      <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-5">
+      <div className="flex flex-wrap justify-center gap-5">
         {roles.map((r, i) => {
           const theme = ROLE_THEMES[i % ROLE_THEMES.length]
           return (
-            <div key={i} className={`relative overflow-hidden bg-white border border-slate-900/7 rounded-2xl
+            <div key={i} style={{ animationDelay: `${i * 90}ms` }} className={`stagger-item w-full sm:w-[calc(50%-0.625rem)] md:w-[calc(33.333%-0.834rem)] relative overflow-hidden bg-white border border-slate-900/7 rounded-2xl
               shadow-[0_1px_6px_rgba(0,0,0,.04),0_4px_18px_rgba(0,0,0,.03)] p-6 sm:p-7 cursor-default
               transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_10px_40px_rgba(0,0,0,.09)] ${theme.hoverBg}
               group`}>

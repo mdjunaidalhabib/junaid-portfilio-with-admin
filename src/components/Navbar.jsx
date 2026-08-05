@@ -53,7 +53,7 @@ export default function Navbar() {
           <a href="#home" onClick={goHome} className="flex items-center gap-2 md:gap-2.5 no-underline min-w-0">
             <div className="w-[32px] h-[32px] md:w-[38px] md:h-[38px] rounded-[9px] md:rounded-[10px] bg-green-500/7 border border-green-500/22 flex items-center justify-center overflow-hidden flex-shrink-0">
               {!imgError
-                ? <img src={personalInfo.profileImage} alt="logo" onError={() => setImgError(true)} className="w-full h-full object-cover rounded-[9px] md:rounded-[10px]" />
+                ? <img src={personalInfo.profileImage} alt="logo" width={38} height={38} decoding="async" onError={() => setImgError(true)} className="w-full h-full object-cover rounded-[9px] md:rounded-[10px]" />
                 : <span className="font-['Tiro_Bangla'] text-green-700 text-[.82rem] md:text-[.9rem] font-bold">জু</span>
               }
             </div>
@@ -124,7 +124,7 @@ export default function Navbar() {
           <div className="flex items-center gap-2.5 min-w-0">
             <div className="w-[34px] h-[34px] rounded-[9px] bg-green-500/10 border border-green-500/25 flex items-center justify-center overflow-hidden flex-shrink-0">
               {!imgError
-                ? <img src={personalInfo.profileImage} alt="logo" className="w-full h-full object-cover" />
+                ? <img src={personalInfo.profileImage} alt="logo" width={34} height={34} decoding="async" className="w-full h-full object-cover" />
                 : <span className="font-['Tiro_Bangla'] text-green-700 text-[.82rem] font-bold">জু</span>
               }
             </div>

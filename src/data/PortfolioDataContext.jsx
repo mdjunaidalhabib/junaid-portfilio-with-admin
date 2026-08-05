@@ -14,26 +14,45 @@ const SECTION_KEYS = [
   'writings',
   'quote',
   'footerDua',
+  'sectionVisibility',
 ]
 
 const TABLE = 'portfolio_content'
+const CACHE_KEY = 'portfolio_content_cache_v1'
+
+// আগের ভিজিটে সেভ করা আসল ডেটা localStorage থেকে পড়ে — এতে দ্বিতীয়বার
+// থেকে সাইট খোলার সাথে সাথেই আসল কন্টেন্ট দেখা যায়, মাঝখানে ডেমো
+// প্লেসহোল্ডার (যেমন "০+" পরিসংখ্যান কার্ড) মুহূর্তের জন্যও চোখে পড়ে না
+function loadCache() {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY)
+    const parsed = raw ? JSON.parse(raw) : null
+    return parsed && typeof parsed === 'object' ? parsed : null
+  } catch {
+    return null
+  }
+}
+
+function saveCache(data) {
+  try { localStorage.setItem(CACHE_KEY, JSON.stringify(data)) } catch { /* private mode ইত্যাদিতে ব্যর্থ হলে উপেক্ষা করা হয় */ }
+}
 
 const PortfolioDataContext = createContext(null)
 
 export function PortfolioDataProvider({ children }) {
   const [data, setData] = useState(() => {
+    const cached = isSupabaseConfigured ? loadCache() : null
     const initial = {}
-    SECTION_KEYS.forEach((key) => { initial[key] = defaults[key] })
+    SECTION_KEYS.forEach((key) => { initial[key] = cached && cached[key] !== undefined ? cached[key] : defaults[key] })
     return initial
   })
-  const [loading, setLoading] = useState(isSupabaseConfigured)
-
+  // সাইট সবসময় সাথে সাথে (cache করা আগের আসল ডেটা, নয়তো ডিফল্ট) দিয়ে
+  // রেন্ডার হয় — লোডিং স্ক্রিনের পেছনে পুরো পেজ আটকে থাকে না। Supabase
+  // থেকে আসল ডেটা এলে নিঃশব্দে পেছনে পেছনে বদলে যায় এবং cache আপডেট হয়।
+  // ডেটা আগের মতোই (অপরিবর্তিত) থাকলে state আপডেট করা হয় না — তাই
+  // পরিসংখ্যানের কাউন্টার/অ্যানিমেশন প্রতিবার লোডে অকারণে রিস্টার্ট হয় না।
   const refresh = useCallback(async () => {
-    if (!isSupabaseConfigured) {
-      setLoading(false)
-      return
-    }
-    setLoading(true)
+    if (!isSupabaseConfigured) return
     try {
       const { data: rows, error } = await supabase.from(TABLE).select('section_key, content')
       if (!error && rows) {
@@ -71,21 +90,23 @@ export function PortfolioDataProvider({ children }) {
             })
           }
         })
-        setData(merged)
+        setData((prev) => {
+          if (JSON.stringify(prev) === JSON.stringify(merged)) return prev
+          saveCache(merged)
+          return merged
+        })
       } else if (error) {
         console.error('Supabase থেকে ডেটা আনতে সমস্যা হয়েছে, ডেমো ডেটা দেখানো হচ্ছে:', error.message)
       }
     } catch (err) {
       console.error('Supabase কানেকশন ব্যর্থ, ডেমো ডেটা দেখানো হচ্ছে:', err)
-    } finally {
-      setLoading(false)
     }
   }, [])
 
   useEffect(() => { refresh() }, [refresh])
 
   return (
-    <PortfolioDataContext.Provider value={{ ...data, loading, refresh }}>
+    <PortfolioDataContext.Provider value={{ ...data, refresh }}>
       {children}
     </PortfolioDataContext.Provider>
   )

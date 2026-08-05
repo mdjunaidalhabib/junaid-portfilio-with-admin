@@ -18,8 +18,8 @@ export default function Writings() {
 
       <div className="flex flex-col gap-3">
         {writings.map((w, i) => (
-          <a key={i} href={w.href || '#'}
-            className="flex items-center gap-3.5 px-4 py-4 border border-slate-900/7 rounded-[13px]
+          <a key={i} href={w.href || '#'} style={{ animationDelay: `${i * 90}ms` }}
+            className="stagger-item flex items-center gap-3.5 px-4 py-4 border border-slate-900/7 rounded-[13px]
               bg-white no-underline text-inherit transition-all duration-300
               hover:border-green-400/22 hover:bg-green-500/2 hover:translate-x-1.5 hover:shadow-[0_4px_18px_rgba(34,197,94,.07)]">
             <span className="text-2xl flex-shrink-0">{w.icon}</span>

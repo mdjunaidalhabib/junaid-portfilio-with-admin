@@ -1,10 +1,14 @@
-import React from 'react'
+import React, { Suspense, lazy } from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App'
-import AdminApp from './admin/AdminApp'
 import { PortfolioDataProvider } from './data/PortfolioDataContext'
 import ErrorBoundary from './ErrorBoundary'
 import './index.css'
+
+// AdminApp আলাদা চাঙ্কে lazy-load হয় — পাবলিক ভিজিটরদের (যারা /admin-এ
+// যায় না) মূল বান্ডেলে অ্যাডমিন প্যানেলের কোড (Supabase auth, লুসাইড
+// আইকন ইত্যাদি) ডাউনলোড করতে হয় না, ফলে সাইট দ্রুত লোড হয়
+const AdminApp = lazy(() => import('./admin/AdminApp'))
 
 const isAdminRoute = window.location.pathname.startsWith('/admin')
 
@@ -12,7 +16,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <ErrorBoundary>
       {isAdminRoute ? (
-        <AdminApp />
+        <Suspense fallback={null}>
+          <AdminApp />
+        </Suspense>
       ) : (
         <PortfolioDataProvider>
           <App />

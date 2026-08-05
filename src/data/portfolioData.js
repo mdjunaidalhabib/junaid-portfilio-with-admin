@@ -17,7 +17,7 @@ export const personalInfo = {
   ],
   specialization: 'তাফসীর ও হাদীস',
   languages:      'বাংলা, আরবি',
-  profileImage:   '/images/profile.jpeg',
+  profileImage:   '/images/profile.webp',
   cvUrl:          '/cv.pdf',
 }
 
@@ -59,22 +59,25 @@ export const stats = [
 // ─── শিক্ষাজীবন ──────────────────────────────────────────────
 export const educations = [
   {
-    year:   '২০XX',
-    degree: 'দাওরায়ে হাদীস (তাকমিল)',
-    inst:   '[প্রতিষ্ঠানের নাম]',
-    badge:  'সর্বোচ্চ ফলাফলে উত্তীর্ণ',
+    year:     '২০XX',
+    degree:   'দাওরায়ে হাদীস (তাকমিল)',
+    inst:     '[প্রতিষ্ঠানের নাম]',
+    badge:    'সর্বোচ্চ ফলাফলে উত্তীর্ণ',
+    category: 'madrasha',
   },
   {
-    year:   '২০XX',
-    degree: 'ফাজিল / আলিম',
-    inst:   '[প্রতিষ্ঠানের নাম]',
-    badge:  '',
+    year:     '২০XX',
+    degree:   'ফাজিল / আলিম',
+    inst:     '[প্রতিষ্ঠানের নাম]',
+    badge:    '',
+    category: 'madrasha',
   },
   {
-    year:   '২০XX',
-    degree: 'মাধ্যমিক (দাখিল)',
-    inst:   '[প্রতিষ্ঠানের নাম]',
-    badge:  '',
+    year:     '২০XX',
+    degree:   'মাধ্যমিক (দাখিল)',
+    inst:     '[প্রতিষ্ঠানের নাম]',
+    badge:    '',
+    category: 'madrasha',
   },
 ]
 
@@ -137,4 +140,15 @@ export const footerDua = {
   arabic:       'جَزَاكَ اللّهُ خَيْرًا',
   transliterate:'জাযাকাল্লাহু খাইরান',
   translation:  'আল্লাহ আপনাকে উত্তম প্রতিদান দিন',
+}
+
+// ─── সেকশন দৃশ্যমানতা (অ্যাডমিন থেকে চালু/বন্ধ করা যায়) ────────
+export const sectionVisibility = {
+  stats:     true,
+  about:     true,
+  education: true,
+  roles:     true,
+  writings:  true,
+  quote:     true,
+  contact:   true,
 }

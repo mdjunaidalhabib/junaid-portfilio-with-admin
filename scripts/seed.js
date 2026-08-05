@@ -32,6 +32,7 @@ const supabase = createClient(supabaseUrl, serviceRoleKey)
 const SECTION_KEYS = [
   'personalInfo', 'contactInfo', 'socialLinks', 'navItems',
   'stats', 'educations', 'roles', 'writings', 'quote', 'footerDua',
+  'sectionVisibility',
 ]
 
 async function main() {

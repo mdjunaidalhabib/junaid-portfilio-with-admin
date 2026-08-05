@@ -47,7 +47,9 @@ export default function Hero() {
                 bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center z-10
                 shadow-[0_0_0_8px_rgba(34,197,94,.04),0_20px_50px_rgba(34,197,94,.12)] hover:border-green-400/50 transition-[border-color] duration-300">
                 {!imgError
-                  ? <img src={personalInfo.profileImage} alt="প্রোফাইল" onError={() => setImgError(true)} className="w-full h-full object-cover" />
+                  ? <img src={personalInfo.profileImage} alt="প্রোফাইল" width={480} height={480}
+                      fetchpriority="high" loading="eager" decoding="async"
+                      onError={() => setImgError(true)} className="w-full h-full object-cover" />
                   : <div className="text-center select-none">
                       <div className="font-['Tiro_Bangla'] text-[5.5rem] leading-none text-green-600/25">জু</div>
                       <div className="text-[.65rem] text-green-600/35 mt-2 tracking-[.05em]">ছবি যোগ করুন</div>

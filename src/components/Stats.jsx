@@ -15,6 +15,7 @@ export default function Stats() {
     const obs = new IntersectionObserver(([e]) => {
       if (e.isIntersecting && !hasStarted) {
         hasStarted = true
+        e.target.classList.add('visible')
         stats.forEach((s, i) => {
           let v = 0
           const step = Math.max(1, Math.ceil(s.val / 90))
@@ -32,9 +33,9 @@ export default function Stats() {
 
   return (
     <div ref={ref} className="bg-gradient-to-br from-green-50 to-slate-50 border-t border-green-500/10 border-b border-green-500/8">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 flex flex-wrap justify-center gap-4">
         {stats.map((s, i) => (
-          <div key={i} className="text-center py-6 px-3.5 rounded-2xl bg-white border border-green-500/10
+          <div key={i} style={{ animationDelay: `${i * 90}ms` }} className="stagger-item w-[calc(50%-0.5rem)] md:w-[calc(25%-0.75rem)] text-center py-6 px-3.5 rounded-2xl bg-white border border-green-500/10
             relative overflow-hidden transition-all duration-300
             before:content-[''] before:absolute before:top-0 before:left-1/2 before:-translate-x-1/2
             before:w-[40%] before:h-0.5 before:bg-gradient-to-r before:from-transparent before:via-green-400 before:to-transparent

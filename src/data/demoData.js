@@ -17,7 +17,7 @@ export const personalInfo = {
   ],
   specialization: 'আপনার বিশেষত্বের ক্ষেত্র',
   languages:      'বাংলা, ইংরেজি',
-  profileImage:   '/images/profile.jpeg',
+  profileImage:   '/images/profile.webp',
   cvUrl:          '/cv.pdf',
 }
 
@@ -53,7 +53,7 @@ export const stats = [
 ]
 
 export const educations = [
-  { year: '২০XX', degree: 'ডিগ্রির নাম', inst: 'প্রতিষ্ঠানের নাম', badge: '' },
+  { year: '২০XX', degree: 'ডিগ্রির নাম', inst: 'প্রতিষ্ঠানের নাম', badge: '', category: 'madrasha' },
 ]
 
 export const roles = [
@@ -85,4 +85,16 @@ export const footerDua = {
   arabic:        '',
   transliterate: '',
   translation:   '',
+}
+
+// কোন কোন সেকশন পাবলিক সাইটে দেখানো হবে — অ্যাডমিন প্যানেল থেকে
+// যেকোনো সেকশন বন্ধ (false) করলে সেটা সাইটে আর দেখাবে না
+export const sectionVisibility = {
+  stats:     true,
+  about:     true,
+  education: true,
+  roles:     true,
+  writings:  true,
+  quote:     true,
+  contact:   true,
 }
