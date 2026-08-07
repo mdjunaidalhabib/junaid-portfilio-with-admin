@@ -3,7 +3,7 @@ import {
   Eye, EyeOff, Pencil, Check, LogOut, LayoutDashboard,
   User, Phone, Share2, Menu, BarChart3, GraduationCap,
   Briefcase, BookOpen, Quote as QuoteIcon, MoonStar, KeyRound,
-  Image as ImageIcon, FileText, UploadCloud, Loader2, ToggleLeft,
+  Image as ImageIcon, FileText, UploadCloud, Loader2,
 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { uploadAsset } from '../lib/storage'
@@ -21,7 +21,6 @@ const SECTION_ICONS = {
   writings: BookOpen,
   quote: QuoteIcon,
   footerDua: MoonStar,
-  sectionVisibility: ToggleLeft,
   account: KeyRound,
 }
 
@@ -36,7 +35,6 @@ const SECTIONS = [
   { key: 'writings', label: 'লেখালেখি / বই', type: 'array' },
   { key: 'quote', label: 'অনুপ্রেরণামূলক উক্তি', type: 'object' },
   { key: 'footerDua', label: 'ফুটারের আরবি দোয়া', type: 'object' },
-  { key: 'sectionVisibility', label: 'সেকশন দৃশ্যমানতা', type: 'visibility' },
   { key: 'account', label: 'পাসওয়ার্ড পরিবর্তন', type: 'account' },
 ]
 
@@ -242,7 +240,7 @@ export default function AdminPanel({ onLogout }) {
                   )}
                 </div>
 
-                {activeSection.type !== 'account' && activeSection.type !== 'visibility' && (
+                {activeSection.type !== 'account' && (
                   <div className="flex items-center gap-3">
                     {!isDirty && !saving && (
                       <span className="text-xs text-slate-400">কোনো পরিবর্তন করা হয়নি</span>
@@ -271,11 +269,6 @@ export default function AdminPanel({ onLogout }) {
 
               {activeSection.type === 'account' ? (
                 <ChangePasswordForm />
-              ) : activeSection.type === 'visibility' ? (
-                <VisibilityEditor
-                  value={content[activeKey]}
-                  onToggle={toggleSectionVisibility}
-                />
               ) : activeSection.type === 'object' ? (
                 <ObjectEditor
                   sectionKey={activeKey}
@@ -369,49 +362,6 @@ function ObjectEditor({ sectionKey, version, value, onChange, editingField, setE
           />
         )
       })}
-    </div>
-  )
-}
-
-// ── সেকশন দৃশ্যমানতা (চালু/বন্ধ) ── বন্ধ করলে সেই সেকশন পাবলিক সাইটে
-// আর দেখা যাবে না, তবে ডেটা মুছে যাবে না — যেকোনো সময় আবার চালু করা যাবে
-function VisibilityEditor({ value, onToggle }) {
-  if (!value) return null
-
-  return (
-    <div className="bg-white rounded-lg p-4 sm:p-5 shadow-sm">
-      <p className="text-xs text-slate-400 mb-4">
-        সুইচ চাপা মাত্রই সাথে সাথে সেভ হয়ে যায় (আলাদা করে "আপডেট করুন" চাপতে হবে না) — বন্ধ করলে ডেটা মুছবে না, শুধু সেকশনটা সাইট থেকে লুকিয়ে যাবে।
-      </p>
-      <div className="divide-y divide-slate-100">
-        {Object.keys(value).map((key) => {
-          const meta = SECTION_VISIBILITY_LABELS[key] || { label: key, hint: '' }
-          const on = !!value[key]
-          return (
-            <div key={key} className="flex items-center justify-between gap-4 py-3.5 first:pt-0 last:pb-0">
-              <div>
-                <div className="text-sm font-medium text-slate-800">{meta.label}</div>
-                {meta.hint && <div className="text-[.72rem] text-slate-400 mt-0.5">{meta.hint}</div>}
-              </div>
-              <button
-                type="button"
-                role="switch"
-                aria-checked={on}
-                onClick={() => onToggle(key)}
-                className={`relative inline-flex flex-shrink-0 h-7 w-12 items-center rounded-full transition-colors duration-200 ${
-                  on ? 'bg-green-600' : 'bg-slate-300'
-                }`}
-              >
-                <span
-                  className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-sm transition-transform duration-200 ${
-                    on ? 'translate-x-6' : 'translate-x-1'
-                  }`}
-                />
-              </button>
-            </div>
-          )
-        })}
-      </div>
     </div>
   )
 }
@@ -530,7 +480,7 @@ function PdfUploadField({ value, onChange }) {
 // অ্যারে-আইটেমের কিছু ইংরেজি ফিল্ড-কী-এর জন্য বাংলা লেবেল
 const ARRAY_FIELD_LABELS = {
   socialLinks: { label: 'নাম', href: 'লিংক' },
-  educations: { year: 'সাল', degree: 'ডিগ্রি / সনদ', inst: 'প্রতিষ্ঠানের নাম', badge: 'ব্যাজ (ঐচ্ছিক)', category: 'ক্যাটাগরি' },
+  educations: { year: 'সাল', degree: 'ডিগ্রি / সনদ', inst: 'প্রতিষ্ঠানের নাম', badge: 'ব্যাজ (ঐচ্ছিক)', category: 'ক্যাটাগরি', grade: 'গ্রেড', point: 'পয়েন্ট (ঐচ্ছিক)' },
   roles: { icon: 'আইকন (ইমোজি)', title: 'শিরোনাম', desc: 'বিবরণ' },
   writings: { type: 'ধরন', title: 'শিরোনাম', sub: 'উপশিরোনাম', icon: 'আইকন (ইমোজি)', gold: 'বিশেষ (গোল্ড রঙ)', href: 'লিংক' },
   stats: { val: 'সংখ্যা', suf: 'প্রত্যয় (যেমন +)', label: 'লেবেল', icon: 'আইকন (ইমোজি)' },
@@ -540,6 +490,12 @@ const EDUCATION_CATEGORIES = [
   { value: 'madrasha', label: 'মাদরাসা শিক্ষা' },
   { value: 'general',  label: 'সাধারণ শিক্ষা' },
 ]
+
+// ক্যাটাগরি অনুযায়ী গ্রেড অপশন
+const EDUCATION_GRADES = {
+  madrasha: ['মুমতাজ', 'জায়্যিদ জিদ্দান', 'জায়্যিদ', 'মাকবুল'],
+  general:  ['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'D', 'F'],
+}
 
 function CategorySelect({ value, onChange }) {
   return (
@@ -552,6 +508,25 @@ function CategorySelect({ value, onChange }) {
       >
         {EDUCATION_CATEGORIES.map((c) => (
           <option key={c.value} value={c.value}>{c.label}</option>
+        ))}
+      </select>
+    </div>
+  )
+}
+
+function GradeSelect({ category, value, onChange }) {
+  const options = EDUCATION_GRADES[category || 'madrasha'] || EDUCATION_GRADES.madrasha
+  return (
+    <div>
+      <label className="block text-xs text-slate-500 mb-1">গ্রেড</label>
+      <select
+        value={value || ''}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-500"
+      >
+        <option value="">— নির্বাচন করুন —</option>
+        {options.map((g) => (
+          <option key={g} value={g}>{g}</option>
         ))}
       </select>
     </div>
@@ -598,6 +573,16 @@ function ArrayEditor({ sectionKey, version, value, onChange, editingField, setEd
                   return (
                     <CategorySelect
                       key={`${sectionKey}-${idx}-${field}-${version}`}
+                      value={val}
+                      onChange={(v) => updateItem(idx, { ...item, [field]: v })}
+                    />
+                  )
+                }
+                if (sectionKey === 'educations' && field === 'grade') {
+                  return (
+                    <GradeSelect
+                      key={`${sectionKey}-${idx}-${field}-${version}`}
+                      category={item.category}
                       value={val}
                       onChange={(v) => updateItem(idx, { ...item, [field]: v })}
                     />

@@ -12,7 +12,7 @@ export default function Footer() {
   ]
   const copyrightText = `© ${new Date().getFullYear()} ${personalInfo.name} · সর্বস্বত্ব সংরক্ষিত`
   return (
-    <footer className="bg-gradient-to-b from-green-50 to-green-100">
+    <footer className="bg-gradient-to-b from-green-50 to-green-100 dark:from-slate-950 dark:to-slate-900">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-14 text-center">
         {/* Dua block */}
         <div className="relative inline-block px-[52px] py-7 mx-auto">
@@ -26,13 +26,13 @@ export default function Footer() {
           <div className="font-['Hind_Siliguri'] text-[.78rem] font-semibold tracking-[.2em] uppercase text-green-400 mb-1.5">
             {footerDua.transliterate}
           </div>
-          <div className="font-['Tiro_Bangla'] text-[.95rem] text-slate-500 italic">{footerDua.translation}</div>
+          <div className="font-['Tiro_Bangla'] text-[.95rem] text-slate-500 dark:text-slate-400 italic">{footerDua.translation}</div>
           <div className="w-[120px] h-px mx-auto mt-4 bg-gradient-to-r from-transparent via-green-400/45 to-transparent" />
         </div>
 
         {/* Name */}
-        <div className="font-['Tiro_Bangla'] text-[1.5rem] text-slate-900 mb-1 mt-7">{personalInfo.name}</div>
-        <div className="text-[.82rem] text-slate-400 mb-6">{personalInfo.roles.join(' · ')}</div>
+        <div className="font-['Tiro_Bangla'] text-[1.5rem] text-slate-900 dark:text-slate-100 mb-1 mt-7">{personalInfo.name}</div>
+        <div className="text-[.82rem] text-slate-400 dark:text-slate-500 mb-6">{personalInfo.roles.join(' · ')}</div>
 
         {/* Social icons */}
         <div className="flex justify-center gap-3 mb-8">
@@ -59,7 +59,7 @@ export default function Footer() {
           <div className="w-10 h-px bg-gradient-to-l from-transparent to-green-400/35" />
         </div>
 
-        <div className="text-[.78rem] text-slate-400">{copyrightText}</div>
+        <div className="text-[.78rem] text-slate-400 dark:text-slate-500">{copyrightText}</div>
       </div>
     </footer>
   )

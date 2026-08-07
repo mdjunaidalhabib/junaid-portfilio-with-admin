@@ -23,7 +23,7 @@ export default function Hero() {
   ]
 
   return (
-    <section className="relative flex items-center overflow-hidden bg-white min-h-[calc(100vh-48px)] md:min-h-0">
+    <section className="relative flex items-center overflow-hidden bg-white dark:bg-slate-900 min-h-[calc(100vh-48px)] md:min-h-0">
       {/* Mesh background */}
       <div className="absolute inset-0 pointer-events-none"
         style={{ backgroundImage:`radial-gradient(circle at 15% 50%,rgba(34,197,94,.06) 0%,transparent 45%),radial-gradient(circle at 85% 20%,rgba(34,197,94,.04) 0%,transparent 40%),radial-gradient(circle at 60% 85%,rgba(74,222,128,.03) 0%,transparent 35%)` }} />
@@ -44,7 +44,7 @@ export default function Hero() {
               <div className="absolute rounded-full border border-dashed border-green-400/28 animate-spin-slow" style={{ inset:'-14px' }} />
               <div className="absolute rounded-full border border-green-400/10 animate-spin-slow-rev" style={{ inset:'-26px' }} />
               <div className="relative w-[300px] h-[300px] sm:w-[260px] sm:h-[260px] md:w-[320px] md:h-[320px] lg:w-[360px] lg:h-[360px] rounded-full overflow-hidden border-[3px] border-green-400/20
-                bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center z-10
+                bg-gradient-to-br from-green-50 to-green-100 dark:from-slate-900 dark:to-slate-950 flex items-center justify-center z-10
                 shadow-[0_0_0_8px_rgba(34,197,94,.04),0_20px_50px_rgba(34,197,94,.12)] hover:border-green-400/50 transition-[border-color] duration-300">
                 {!imgError
                   ? <img src={personalInfo.profileImage} alt="প্রোফাইল" width={480} height={480}
@@ -93,7 +93,7 @@ export default function Hero() {
                     </div>
                     {item.href
                       ? <a href={item.href} className="text-green-700 no-underline font-medium">{item.label}</a>
-                      : <span className="text-slate-600">{item.label}</span>
+                      : <span className="text-slate-600 dark:text-slate-300">{item.label}</span>
                     }
                   </div>
                 )
@@ -125,7 +125,7 @@ export default function Hero() {
                 <FaPaperPlane size={13} /> যোগাযোগ করুন
               </a>
               <a href={personalInfo.cvUrl || '/cv.pdf'} download
-                className="inline-flex items-center gap-1.5 bg-transparent text-slate-900 border-[1.5px] border-slate-900/14
+                className="inline-flex items-center gap-1.5 bg-transparent text-slate-900 dark:text-slate-100 border-[1.5px] border-slate-900/14
                 py-3 px-[26px] rounded-full font-semibold text-[.88rem] no-underline
                 hover:border-green-400 hover:text-green-700 hover:bg-green-500/5 hover:-translate-y-0.5 transition-all duration-300">
                 <FaDownload size={13} /> জীবনবৃত্তান্ত

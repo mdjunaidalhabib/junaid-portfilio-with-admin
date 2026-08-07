@@ -10,6 +10,15 @@
     <!-- হিরো সেকশনের প্রোফাইল ছবি (LCP এলিমেন্ট) আগে থেকেই ফেচ শুরু করে দেয়,
          যাতে JS বান্ডল লোড/পার্স হওয়ার আগেই ছবিটা রেডি থাকে -->
     <link rel="preload" as="image" href="/images/profile.webp" fetchpriority="high" />
+    <script>
+      // পেজ রেন্ডার হওয়ার আগেই থিম সেট করে দেয়, যাতে ডার্ক মোডে সাদা ব্যাকগ্রাউন্ড
+      // এক মুহূর্তের জন্যও ফ্ল্যাশ (flash) না করে
+      (function () {
+        var saved = localStorage.getItem('theme');
+        var wantsDark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (wantsDark) document.documentElement.classList.add('dark');
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

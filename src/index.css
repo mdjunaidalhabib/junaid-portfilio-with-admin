@@ -10,10 +10,16 @@
     color: #0f172a;
     font-family: 'Hind Siliguri', sans-serif;
     -webkit-font-smoothing: antialiased;
+    transition: background-color .25s ease, color .25s ease;
+  }
+  html.dark body {
+    background: #0b1220;
+    color: #e2e8f0;
   }
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-track { background: #f8fafc; }
   ::-webkit-scrollbar-thumb { background: #22c55e; border-radius: 4px; }
+  html.dark ::-webkit-scrollbar-track { background: #0b1220; }
 }
 
 @layer utilities {

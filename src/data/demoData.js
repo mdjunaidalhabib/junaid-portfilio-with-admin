@@ -53,7 +53,7 @@ export const stats = [
 ]
 
 export const educations = [
-  { year: '২০XX', degree: 'ডিগ্রির নাম', inst: 'প্রতিষ্ঠানের নাম', badge: '', category: 'madrasha' },
+  { year: '২০XX', degree: 'ডিগ্রির নাম', inst: 'প্রতিষ্ঠানের নাম', badge: '', category: 'madrasha', grade: '', point: '' },
 ]
 
 export const roles = [

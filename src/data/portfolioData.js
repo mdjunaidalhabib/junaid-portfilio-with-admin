@@ -64,6 +64,8 @@ export const educations = [
     inst:     '[প্রতিষ্ঠানের নাম]',
     badge:    'সর্বোচ্চ ফলাফলে উত্তীর্ণ',
     category: 'madrasha',
+    grade:    'মুমতাজ',
+    point:    '',
   },
   {
     year:     '২০XX',
@@ -71,6 +73,8 @@ export const educations = [
     inst:     '[প্রতিষ্ঠানের নাম]',
     badge:    '',
     category: 'madrasha',
+    grade:    '',
+    point:    '',
   },
   {
     year:     '২০XX',
@@ -78,6 +82,8 @@ export const educations = [
     inst:     '[প্রতিষ্ঠানের নাম]',
     badge:    '',
     category: 'madrasha',
+    grade:    '',
+    point:    '',
   },
 ]
 

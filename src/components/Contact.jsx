@@ -22,21 +22,21 @@ export default function Contact() {
         text-green-700 bg-green-500/7 border border-green-400/20 px-3 py-1 rounded-full mb-2.5">
         ✦ যোগাযোগ
       </div>
-      <h2 className="font-['Tiro_Bangla'] text-slate-900 mb-2 leading-tight" style={{ fontSize: 'clamp(1.6rem,4vw,2.2rem)' }}>
+      <h2 className="font-['Tiro_Bangla'] text-slate-900 dark:text-slate-100 mb-2 leading-tight" style={{ fontSize: 'clamp(1.6rem,4vw,2.2rem)' }}>
         যোগাযোগ করুন
       </h2>
       <div className="h-0.5 w-10 bg-gradient-to-r from-green-400 to-transparent rounded mb-9" />
 
       <div className="grid sm:grid-cols-2 gap-5">
         {/* Direct contact */}
-        <div className="bg-white border border-slate-900/7 rounded-2xl shadow-[0_1px_6px_rgba(0,0,0,.04),0_4px_18px_rgba(0,0,0,.03)] p-6 sm:p-7 relative overflow-hidden
+        <div className="bg-white dark:bg-slate-900 border border-slate-900/7 dark:border-white/8 rounded-2xl shadow-[0_1px_6px_rgba(0,0,0,.04),0_4px_18px_rgba(0,0,0,.03)] p-6 sm:p-7 relative overflow-hidden
           transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_10px_40px_rgba(0,0,0,.09)]">
           <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-yellow-400/60 to-transparent" />
           <div className="flex items-center gap-2.5 mb-6">
             <span className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 bg-yellow-500/10 border border-yellow-400/30 text-yellow-600">
               <FaPaperPlaneIcon />
             </span>
-            <div className="font-['Tiro_Bangla'] text-[1.1rem] text-slate-900 font-semibold">প্রত্যক্ষ যোগাযোগ</div>
+            <div className="font-['Tiro_Bangla'] text-[1.1rem] text-slate-900 dark:text-slate-100 font-semibold">প্রত্যক্ষ যোগাযোগ</div>
           </div>
           <div className="flex flex-col gap-2">
             {directContacts.map(({ icon, label, value, href, key }, i) => {
@@ -52,10 +52,10 @@ export default function Contact() {
                   <div className="min-w-0">
                     <div className="text-[.62rem] font-bold uppercase tracking-[.16em] mb-0.5" style={{ color: c.color }}>{label}</div>
                     {href
-                      ? <a href={href} className="text-[.92rem] text-slate-900 no-underline font-semibold transition-colors truncate block"
+                      ? <a href={href} className="text-[.92rem] text-slate-900 dark:text-slate-100 no-underline font-semibold transition-colors truncate block"
                           onMouseOver={e => { e.currentTarget.style.color = c.color }}
                           onMouseOut={e => { e.currentTarget.style.color = '' }}>{value}</a>
-                      : <span className="text-[.92rem] text-slate-900 font-semibold truncate block">{value}</span>
+                      : <span className="text-[.92rem] text-slate-900 dark:text-slate-100 font-semibold truncate block">{value}</span>
                     }
                   </div>
                 </div>
@@ -65,14 +65,14 @@ export default function Contact() {
         </div>
 
         {/* Social */}
-        <div className="bg-white border border-slate-900/7 rounded-2xl shadow-[0_1px_6px_rgba(0,0,0,.04),0_4px_18px_rgba(0,0,0,.03)] p-6 sm:p-7 relative overflow-hidden
+        <div className="bg-white dark:bg-slate-900 border border-slate-900/7 dark:border-white/8 rounded-2xl shadow-[0_1px_6px_rgba(0,0,0,.04),0_4px_18px_rgba(0,0,0,.03)] p-6 sm:p-7 relative overflow-hidden
           transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_10px_40px_rgba(0,0,0,.09)]">
           <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-green-400/40 to-transparent" />
           <div className="flex items-center gap-2.5 mb-6">
             <span className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 bg-green-500/10 border border-green-400/30 text-green-600">
               <FaShareIcon />
             </span>
-            <div className="font-['Tiro_Bangla'] text-[1.1rem] text-slate-900 font-semibold">সামাজিক মাধ্যম</div>
+            <div className="font-['Tiro_Bangla'] text-[1.1rem] text-slate-900 dark:text-slate-100 font-semibold">সামাজিক মাধ্যম</div>
           </div>
           <div className="grid grid-cols-2 gap-3">
             {socialLinks.map((s, i) => {
@@ -82,7 +82,7 @@ export default function Contact() {
               return (
                 <a key={s.label} href={s.href}
                   className="stagger-item flex flex-col items-center text-center gap-2 px-3 py-4 border rounded-2xl no-underline
-                    text-slate-600 transition-all duration-250 hover:-translate-y-1 hover:shadow-[0_8px_20px_rgba(0,0,0,.07)]"
+                    text-slate-600 dark:text-slate-300 transition-all duration-250 hover:-translate-y-1 hover:shadow-[0_8px_20px_rgba(0,0,0,.07)]"
                   style={{ borderColor: 'rgba(15,23,42,.08)', animationDelay: `${i * 90}ms` }}
                   onMouseOver={e => { e.currentTarget.style.borderColor = b.border; e.currentTarget.style.background = b.bg }}
                   onMouseOut={e => { e.currentTarget.style.borderColor = 'rgba(15,23,42,.08)'; e.currentTarget.style.background = '' }}>
