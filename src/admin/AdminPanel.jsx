@@ -82,7 +82,11 @@ export default function AdminPanel({ onLogout }) {
     setLoading(true)
     const { data, error } = await supabase.from(TABLE).select('section_key, content')
     const merged = {}
-    SECTIONS.forEach(({ key, type }) => {
+    // মেনু ট্যাবে দেখানো হয় না এমন কিছু কী (যেমন sectionVisibility) থাকলেও
+    // ডেটাবেজ থেকে অবশ্যই লোড/মার্জ করতে হবে, নাহলে টগল বাটন ভুল অবস্থা দেখাবে
+    const LOAD_KEYS = [...SECTIONS.map((s) => s.key), 'sectionVisibility']
+    LOAD_KEYS.forEach((key) => {
+      const type = SECTIONS.find((s) => s.key === key)?.type || 'object'
       const row = !error && data ? data.find((r) => r.section_key === key) : null
       const saved = row ? row.content : null
       const base = defaults[key]
@@ -305,6 +309,29 @@ const CONTACT_FIELD_META = {
 }
 
 // ── অবজেক্ট (key: value) এডিটর ───────────────────────────────
+const OBJECT_FIELD_LABELS = {
+  personalInfo: {
+    name:           'নাম (সংক্ষিপ্ত) — লোগো, হিরো সেকশন ও ফুটারে দেখায়',
+    fullName:       'পূর্ণ নাম — "আমার সম্পর্কে" সেকশনের তথ্য কার্ডে দেখায়',
+    title:          'পদবি/উপাধি — হিরো সেকশনে নামের উপরে দেখায়',
+    roles:          'ভূমিকা/পরিচয় (কমা দিয়ে আলাদা) — হিরো ও "আমার সম্পর্কে"-তে দেখায়',
+    tagline:        'ট্যাগলাইন — লোগোর নিচে ও নেভিগেশনে দেখায়',
+    bio:            'জীবনী অনুচ্ছেদ — "আমার সম্পর্কে" সেকশনে দেখায়',
+    specialization: 'বিশেষায়ন — "আমার সম্পর্কে" তথ্য কার্ডে দেখায়',
+    languages:      'ভাষা — "আমার সম্পর্কে" তথ্য কার্ডে দেখায়',
+  },
+  quote: {
+    arabic: 'আরবি উক্তি',
+    bangla: 'বাংলা অনুবাদ',
+    source: 'সূত্র/রেফারেন্স',
+  },
+  footerDua: {
+    arabic:        'আরবি দোয়া',
+    transliterate: 'উচ্চারণ (বাংলায়)',
+    translation:   'বাংলা অর্থ',
+  },
+}
+
 function ObjectEditor({ sectionKey, version, value, onChange, editingField, setEditingField }) {
   if (!value) return null
   const entries = Object.entries(value)
@@ -356,7 +383,7 @@ function ObjectEditor({ sectionKey, version, value, onChange, editingField, setE
             fieldId={`${sectionKey}-${field}`}
             editingField={editingField}
             setEditingField={setEditingField}
-            label={field}
+            label={OBJECT_FIELD_LABELS[sectionKey]?.[field] || field}
             value={val}
             onChange={(v) => setField(field, v)}
           />

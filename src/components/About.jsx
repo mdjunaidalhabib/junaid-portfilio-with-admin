@@ -46,10 +46,11 @@ export default function About() {
 
         <div className="bg-white dark:bg-slate-900 border border-slate-900/7 dark:border-white/8 rounded-2xl shadow-[0_1px_6px_rgba(0,0,0,.04),0_4px_18px_rgba(0,0,0,.03)] p-6">
           {[
+            { label: 'পূর্ণ নাম',  value: personalInfo.fullName },
             { label: 'মূল পরিচয়', value: personalInfo.roles.join(', ') },
             { label: 'বিশেষায়ন',  value: personalInfo.specialization },
             { label: 'ভাষা',       value: personalInfo.languages },
-          ].map(({ label, value }, i, arr) => (
+          ].filter(f => f.value).map(({ label, value }, i, arr) => (
             <div key={label} className={i < arr.length - 1 ? 'mb-4 pb-4 border-b border-slate-100 dark:border-slate-800' : ''}>
               <div className="text-[.62rem] font-bold uppercase tracking-[.14em] text-green-400 mb-0.5">{label}</div>
               <div className="text-[.88rem] text-slate-600 dark:text-slate-300 font-medium">{value}</div>
