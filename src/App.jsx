@@ -33,7 +33,7 @@ export default function App() {
   ].filter(Boolean)
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0b1220] text-slate-900 dark:text-slate-200">
       <Navbar />
       <Hero />
       {v.stats && <Stats />}

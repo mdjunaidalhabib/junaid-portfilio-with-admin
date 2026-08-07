@@ -108,11 +108,19 @@ export default function Navbar() {
               onClick={() => setDark(d => !d)}
               aria-label={dark ? 'লাইট মোড চালু করুন' : 'ডার্ক মোড চালু করুন'}
               title={dark ? 'লাইট মোড' : 'ডার্ক মোড'}
-              className="w-9 h-9 flex items-center justify-center rounded-full border border-slate-200 dark:border-slate-700
-                text-slate-500 dark:text-slate-300 hover:text-green-700 dark:hover:text-green-400
-                hover:border-green-400/40 transition-colors flex-shrink-0"
+              className={`relative w-[3.4rem] h-7 flex-shrink-0 rounded-full border transition-colors duration-300
+                ${dark ? 'bg-slate-800 border-slate-700' : 'bg-slate-100 border-slate-200'}`}
             >
-              {dark ? <FaSun size={14} /> : <FaMoon size={14} />}
+              <FaMoon size={11} className={`absolute left-[7px] top-1/2 -translate-y-1/2 transition-colors duration-300 ${dark ? 'text-slate-500' : 'text-green-600'}`} />
+              <FaSun size={11} className={`absolute right-[7px] top-1/2 -translate-y-1/2 transition-colors duration-300 ${dark ? 'text-amber-400' : 'text-slate-400'}`} />
+              <span
+                className={`absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white dark:bg-slate-950
+                  shadow-[0_1px_4px_rgba(0,0,0,.25)] flex items-center justify-center
+                  transition-transform duration-300 ease-[cubic-bezier(.22,1,.36,1)]
+                  ${dark ? 'translate-x-[1.65rem]' : 'translate-x-0'}`}
+              >
+                {dark ? <FaSun size={12} className="text-amber-400" /> : <FaMoon size={12} className="text-green-600" />}
+              </span>
             </button>
           </nav>
 
@@ -121,9 +129,10 @@ export default function Navbar() {
             <button
               onClick={() => setDark(d => !d)}
               aria-label={dark ? 'লাইট মোড চালু করুন' : 'ডার্ক মোড চালু করুন'}
-              className="p-2 rounded-lg border-0 cursor-pointer transition-colors text-slate-600 dark:text-slate-300 bg-transparent"
+              className="w-9 h-9 flex items-center justify-center rounded-full border-0 cursor-pointer transition-colors
+                text-amber-500 dark:text-amber-400 bg-slate-100 dark:bg-slate-800"
             >
-              {dark ? <FaSun size={16} /> : <FaMoon size={16} />}
+              {dark ? <FaSun size={15} /> : <FaMoon size={15} className="text-green-600" />}
             </button>
             <button className={`p-2 rounded-lg border-0 cursor-pointer transition-colors text-slate-600 dark:text-slate-300 ${menuOpen ? 'bg-green-500/8' : 'bg-transparent'}`}
               aria-label="মেনু" onClick={() => setMenuOpen(true)}>
