@@ -41,8 +41,8 @@ export default function Hero() {
           <div className="flex justify-center items-center md:pr-[52px] md:border-r md:border-green-500/10 pb-10 md:pb-0"
             style={{ opacity:vis?1:0, transform:vis?'translateX(0)':'translateX(-40px)', transition:'all .8s cubic-bezier(.22,1,.36,1) .3s' }}>
             <div className="relative inline-block">
-              <div className="absolute rounded-full border border-dashed border-green-400/28 dark:border-green-400/55 animate-spin-slow" style={{ inset:'-14px' }} />
-              <div className="absolute rounded-full border border-green-400/10 dark:border-green-400/30 animate-spin-slow-rev" style={{ inset:'-26px' }} />
+              <div className="absolute rounded-full border-2 border-dashed border-green-500/45 dark:border-green-400/60 animate-spin-slow" style={{ inset:'-14px' }} />
+              <div className="absolute rounded-full border-2 border-green-500/22 dark:border-green-400/35 animate-spin-slow-rev" style={{ inset:'-26px' }} />
               <div className="relative w-[300px] h-[300px] sm:w-[260px] sm:h-[260px] md:w-[320px] md:h-[320px] lg:w-[360px] lg:h-[360px] rounded-full overflow-hidden border-[3px] border-green-400/20
                 bg-gradient-to-br from-green-50 to-green-100 dark:from-slate-900 dark:to-slate-950 flex items-center justify-center z-10
                 shadow-[0_0_0_8px_rgba(34,197,94,.04),0_20px_50px_rgba(34,197,94,.12)] hover:border-green-400/50 transition-[border-color] duration-300">
