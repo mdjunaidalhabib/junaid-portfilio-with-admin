@@ -67,9 +67,8 @@ export default function Hero() {
           {/* RIGHT: INFO */}
           <div className="flex flex-col justify-center md:pl-[52px] pt-8 md:pt-0"
             style={{ opacity:vis?1:0, transform:vis?'translateX(0)':'translateX(40px)', transition:'all .8s cubic-bezier(.22,1,.36,1) .5s' }}>
-            <h1 className="font-['Tiro_Bangla'] mb-[18px] block bg-clip-text text-transparent
-                bg-gradient-to-br from-slate-900 to-green-600 dark:from-slate-100 dark:to-green-400"
-              style={{ fontSize:'clamp(2.2rem,5vw,3.4rem)', lineHeight:1.5, paddingTop:'.15em' }}>
+            <h1 className="font-['Tiro_Bangla'] mb-[18px] block text-slate-900 dark:text-slate-100"
+              style={{ fontSize:'clamp(2.2rem,5vw,3.4rem)', lineHeight:1.5 }}>
               {personalInfo.name}
             </h1>
 
