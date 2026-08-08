@@ -7,7 +7,13 @@ import { telHref } from '../lib/phone'
 export default function Contact() {
   const { contactInfo, socialLinks } = usePortfolioData()
   const ref = useReveal()
-  const activeSocials = socialLinks.filter(s => hasValidLink(s.href))
+  const activeSocials = Array.from(
+    new Map(
+      socialLinks
+        .filter(s => hasValidLink(s.href))
+        .map(s => [resolveSocialHref(s.label, s.href), s])
+    ).values()
+  )
 
   const directContacts = [
     { icon: <FaPhone size={15} />,     label: 'মোবাইল', value: contactInfo.phone,    href: telHref(contactInfo.phone), key: 'phone' },

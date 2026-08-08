@@ -7,12 +7,16 @@ export default function Footer() {
 
   // যতগুলো সোশ্যাল লিংক এডমিন প্যানেলে বাস্তবে যোগ করা আছে (খালি/প্লেসহোল্ডার
   // বাদে) শুধু ততগুলোরই আইকন এখানে দেখাবে — লিংকের ধরন দেখে আইকন/রঙ অটোমেটিক
-  const dynamicSocials = socialLinks
-    .filter(s => hasValidLink(s.href))
-    .map(s => {
-      const resolvedHref = resolveSocialHref(s.label, s.href)
-      return { label: s.label, platform: detectPlatform(resolvedHref), href: resolvedHref }
-    })
+  const dynamicSocials = Array.from(
+    new Map(
+      socialLinks
+        .filter(s => hasValidLink(s.href))
+        .map(s => {
+          const resolvedHref = resolveSocialHref(s.label, s.href)
+          return [resolvedHref, { label: s.label, platform: detectPlatform(resolvedHref), href: resolvedHref }]
+        })
+    ).values()
+  )
 
   const footerIcons = [
     ...dynamicSocials,
