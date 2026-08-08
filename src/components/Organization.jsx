@@ -14,6 +14,11 @@ export default function Organization() {
         text-green-700 mb-2.5">
         ✦ প্রতিষ্ঠান
       </div>
+      <h2 className="font-['Tiro_Bangla'] text-slate-900 dark:text-slate-100 mb-2 leading-tight" style={{ fontSize: 'clamp(1.6rem,4vw,2.2rem)' }}>
+        আমার প্রতিষ্ঠান
+      </h2>
+      <div className="h-0.5 w-10 bg-gradient-to-r from-green-400 to-transparent rounded mb-9" />
+
       <div className="relative overflow-hidden rounded-3xl text-center py-14 px-6 sm:px-12
         bg-white dark:bg-slate-900 border border-slate-900/7 dark:border-white/8
         shadow-[0_1px_6px_rgba(0,0,0,.04),0_4px_18px_rgba(0,0,0,.03)]">
