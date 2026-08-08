@@ -11,6 +11,7 @@ const SECTION_KEYS = [
   'stats',
   'educations',
   'roles',
+  'hikmahIt',
   'writings',
   'quote',
   'footerDua',

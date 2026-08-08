@@ -75,6 +75,13 @@ export const writings = [
   },
 ]
 
+// দায়িত্ব সেকশনের পরে দেখানো সংক্ষিপ্ত পরিচিতি — নিজের প্রতিষ্ঠিত
+// প্রতিষ্ঠান/উদ্যোগ সম্পর্কে ২-৩ লাইনের লেখা
+export const hikmahIt = {
+  heading: 'Hikmah IT',
+  text: 'Hikmah IT সম্পর্কে এখানে সংক্ষিপ্ত বর্ণনা লিখুন। /admin প্যানেলে লগইন করে এই লেখা পরিবর্তন করতে পারবেন।',
+}
+
 export const quote = {
   arabic: '',
   bangla: '"এখানে একটি অনুপ্রেরণামূলক উক্তি লিখুন।"',
@@ -94,6 +101,7 @@ export const sectionVisibility = {
   about:     true,
   education: true,
   roles:     true,
+  hikmah:    true,
   writings:  true,
   quote:     true,
   contact:   true,

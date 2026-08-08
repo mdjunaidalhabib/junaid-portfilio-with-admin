@@ -3,7 +3,7 @@ import {
   Eye, EyeOff, Pencil, Check, LogOut, LayoutDashboard,
   User, Phone, Share2, Menu, BarChart3, GraduationCap,
   Briefcase, BookOpen, Quote as QuoteIcon, MoonStar, KeyRound,
-  Image as ImageIcon, FileText, UploadCloud, Loader2,
+  Image as ImageIcon, FileText, UploadCloud, Loader2, Building2,
 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { uploadAsset } from '../lib/storage'
@@ -18,6 +18,7 @@ const SECTION_ICONS = {
   stats: BarChart3,
   educations: GraduationCap,
   roles: Briefcase,
+  hikmahIt: Building2,
   writings: BookOpen,
   quote: QuoteIcon,
   footerDua: MoonStar,
@@ -32,6 +33,7 @@ const SECTIONS = [
   { key: 'stats', label: 'পরিসংখ্যান', type: 'array' },
   { key: 'educations', label: 'শিক্ষাজীবন', type: 'array' },
   { key: 'roles', label: 'কর্মক্ষেত্র ও দায়িত্ব', type: 'array' },
+  { key: 'hikmahIt', label: 'Hikmah IT', type: 'object' },
   { key: 'writings', label: 'লেখালেখি / বই', type: 'array' },
   { key: 'quote', label: 'অনুপ্রেরণামূলক উক্তি', type: 'object' },
   { key: 'footerDua', label: 'ফুটারের আরবি দোয়া', type: 'object' },
@@ -43,6 +45,7 @@ const SECTION_VISIBILITY_LABELS = {
   about:     { label: 'পরিচিতি',               hint: '"আমার সম্পর্কে" সেকশন' },
   education: { label: 'শিক্ষাগত যোগ্যতা',       hint: 'মাদরাসা ও সাধারণ শিক্ষা' },
   roles:     { label: 'কর্মক্ষেত্র ও দায়িত্ব', hint: '' },
+  hikmah:    { label: 'Hikmah IT',              hint: 'দায়িত্ব সেকশনের পরে দেখায়' },
   writings:  { label: 'লেখালেখি / বই',          hint: '' },
   quote:     { label: 'অনুপ্রেরণামূলক উক্তি',    hint: '' },
   contact:   { label: 'যোগাযোগ',                hint: 'ফোন, ইমেইল ও সামাজিক মাধ্যম' },
@@ -58,6 +61,7 @@ const VISIBILITY_MAP = {
   stats: 'stats',
   educations: 'education',
   roles: 'roles',
+  hikmahIt: 'hikmah',
   writings: 'writings',
   quote: 'quote',
 }
@@ -324,6 +328,10 @@ const OBJECT_FIELD_LABELS = {
     arabic: 'আরবি উক্তি',
     bangla: 'বাংলা অনুবাদ',
     source: 'সূত্র/রেফারেন্স',
+  },
+  hikmahIt: {
+    heading: 'শিরোনাম',
+    text:    'বর্ণনা (২-৩ লাইন) — দায়িত্ব সেকশনের পরে দেখায়',
   },
   footerDua: {
     arabic:        'আরবি দোয়া',
