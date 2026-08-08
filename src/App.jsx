@@ -10,6 +10,7 @@ import Writings       from './components/Writings'
 import Quote          from './components/Quote'
 import Contact        from './components/Contact'
 import Footer         from './components/Footer'
+import InstallApp     from './components/InstallApp'
 import { usePortfolioData } from './data/PortfolioDataContext'
 
 const Divider = () => <div className="h-px bg-gradient-to-r from-transparent via-green-400/14 to-transparent" />
@@ -48,6 +49,7 @@ export default function App() {
         ))}
       </div>
       <Footer />
+      <InstallApp />
     </div>
   )
 }

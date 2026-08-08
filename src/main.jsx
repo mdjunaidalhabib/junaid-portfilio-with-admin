@@ -4,6 +4,7 @@ import App from './App'
 import { PortfolioDataProvider } from './data/PortfolioDataContext'
 import ErrorBoundary from './ErrorBoundary'
 import './index.css'
+import './pwa'
 
 // AdminApp আলাদা চাঙ্কে lazy-load হয় — পাবলিক ভিজিটরদের (যারা /admin-এ
 // যায় না) মূল বান্ডেলে অ্যাডমিন প্যানেলের কোড (Supabase auth, লুসাইড
