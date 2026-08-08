@@ -5,7 +5,7 @@ export default function Quote() {
   const { quote } = usePortfolioData()
   const ref = useReveal()
   return (
-    <section ref={ref} className="opacity-0 translate-y-7 transition-[opacity,transform] duration-[650ms] ease-[cubic-bezier(.22,1,.36,1)] pb-20
+    <section ref={ref} className="opacity-0 translate-y-7 transition-[opacity,transform] duration-[650ms] ease-[cubic-bezier(.22,1,.36,1)] pb-14
       [&.visible]:opacity-100 [&.visible]:translate-y-0">
       <div className="relative overflow-hidden rounded-3xl text-center py-16 px-6 sm:px-12
         bg-gradient-to-br from-green-50 to-green-100 dark:from-slate-900 dark:to-slate-950 border border-green-400/18 dark:border-green-400/12">

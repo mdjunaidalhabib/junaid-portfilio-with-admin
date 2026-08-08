@@ -5,7 +5,7 @@ import Stats          from './components/Stats'
 import About          from './components/About'
 import Education      from './components/Education'
 import Roles          from './components/Roles'
-import HikmahIt       from './components/HikmahIt'
+import Organization    from './components/Organization'
 import Writings       from './components/Writings'
 import Quote          from './components/Quote'
 import Contact        from './components/Contact'
@@ -24,7 +24,7 @@ export default function App() {
     v.about && <About key="about" />,
     v.education && <Education key="education" />,
     v.roles && <Roles key="roles" />,
-    v.hikmah && <HikmahIt key="hikmah" />,
+    v.organization && <Organization key="organization" />,
     (v.writings || v.quote) && (
       <Fragment key="writings-quote">
         {v.writings && <Writings />}

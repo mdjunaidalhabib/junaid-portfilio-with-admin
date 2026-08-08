@@ -5,7 +5,7 @@ export default function Writings() {
   const { writings } = usePortfolioData()
   const ref = useReveal()
   return (
-    <section id="lekhalekhi" ref={ref} className="opacity-0 translate-y-7 transition-[opacity,transform] duration-[650ms] ease-[cubic-bezier(.22,1,.36,1)] py-20
+    <section id="lekhalekhi" ref={ref} className="opacity-0 translate-y-7 transition-[opacity,transform] duration-[650ms] ease-[cubic-bezier(.22,1,.36,1)] py-14
       [&.visible]:opacity-100 [&.visible]:translate-y-0">
       <div className="inline-flex items-center gap-1.5 text-[.6rem] font-bold tracking-[.2em] uppercase
         text-green-700 bg-green-500/7 border border-green-400/20 px-3 py-1 rounded-full mb-2.5">

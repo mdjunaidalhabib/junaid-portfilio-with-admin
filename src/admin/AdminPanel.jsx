@@ -18,7 +18,7 @@ const SECTION_ICONS = {
   stats: BarChart3,
   educations: GraduationCap,
   roles: Briefcase,
-  hikmahIt: Building2,
+  organization: Building2,
   writings: BookOpen,
   quote: QuoteIcon,
   footerDua: MoonStar,
@@ -33,7 +33,7 @@ const SECTIONS = [
   { key: 'stats', label: 'পরিসংখ্যান', type: 'array' },
   { key: 'educations', label: 'শিক্ষাজীবন', type: 'array' },
   { key: 'roles', label: 'কর্মক্ষেত্র ও দায়িত্ব', type: 'array' },
-  { key: 'hikmahIt', label: 'Hikmah IT', type: 'object' },
+  { key: 'organization', label: 'প্রতিষ্ঠান', type: 'object' },
   { key: 'writings', label: 'লেখালেখি / বই', type: 'array' },
   { key: 'quote', label: 'অনুপ্রেরণামূলক উক্তি', type: 'object' },
   { key: 'footerDua', label: 'ফুটারের আরবি দোয়া', type: 'object' },
@@ -45,7 +45,7 @@ const SECTION_VISIBILITY_LABELS = {
   about:     { label: 'পরিচিতি',               hint: '"আমার সম্পর্কে" সেকশন' },
   education: { label: 'শিক্ষাগত যোগ্যতা',       hint: 'মাদরাসা ও সাধারণ শিক্ষা' },
   roles:     { label: 'কর্মক্ষেত্র ও দায়িত্ব', hint: '' },
-  hikmah:    { label: 'Hikmah IT',              hint: 'দায়িত্ব সেকশনের পরে দেখায়' },
+  organization: { label: 'প্রতিষ্ঠান',          hint: 'দায়িত্ব সেকশনের পরে দেখায়' },
   writings:  { label: 'লেখালেখি / বই',          hint: '' },
   quote:     { label: 'অনুপ্রেরণামূলক উক্তি',    hint: '' },
   contact:   { label: 'যোগাযোগ',                hint: 'ফোন, ইমেইল ও সামাজিক মাধ্যম' },
@@ -61,7 +61,7 @@ const VISIBILITY_MAP = {
   stats: 'stats',
   educations: 'education',
   roles: 'roles',
-  hikmahIt: 'hikmah',
+  organization: 'organization',
   writings: 'writings',
   quote: 'quote',
 }
@@ -329,9 +329,10 @@ const OBJECT_FIELD_LABELS = {
     bangla: 'বাংলা অনুবাদ',
     source: 'সূত্র/রেফারেন্স',
   },
-  hikmahIt: {
+  organization: {
     heading: 'শিরোনাম',
     text:    'বর্ণনা (২-৩ লাইন) — দায়িত্ব সেকশনের পরে দেখায়',
+    link:    'ওয়েবসাইট লিংক (ঐচ্ছিক — খালি রাখলে বাটন দেখাবে না)',
   },
   footerDua: {
     arabic:        'আরবি দোয়া',
