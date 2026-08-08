@@ -32,6 +32,13 @@ export function detectPlatform(href) {
   return 'website'
 }
 
+// এডমিন প্যানেলে যে লিংকগুলো এখনো খালি/প্লেসহোল্ডার ('#' বা ফাঁকা) রয়ে গেছে,
+// সেগুলো ফ্রন্টএন্ডে না দেখানোর জন্য এই ফাংশন দিয়ে ফিল্টার করা হয়
+export function hasValidLink(href) {
+  const h = (href || '').trim()
+  return h !== '' && h !== '#'
+}
+
 export const PLATFORM_ICONS = {
   facebook:  FaFacebook,
   whatsapp:  FaWhatsapp,

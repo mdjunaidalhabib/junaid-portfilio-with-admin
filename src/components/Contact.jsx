@@ -1,12 +1,13 @@
 import { useReveal } from '../hooks/useReveal'
 import { FaEnvelope, FaPhone, FaMapMarker } from 'react-icons/fa'
 import { usePortfolioData } from '../data/PortfolioDataContext'
-import { BRAND, CONTACT_COLORS, PLATFORM_ICONS, detectPlatform } from '../data/brandColors'
+import { BRAND, CONTACT_COLORS, PLATFORM_ICONS, detectPlatform, hasValidLink } from '../data/brandColors'
 import { telHref } from '../lib/phone'
 
 export default function Contact() {
   const { contactInfo, socialLinks } = usePortfolioData()
   const ref = useReveal()
+  const activeSocials = socialLinks.filter(s => hasValidLink(s.href))
 
   const directContacts = [
     { icon: <FaPhone size={15} />,     label: 'মোবাইল', value: contactInfo.phone,    href: telHref(contactInfo.phone), key: 'phone' },
@@ -27,7 +28,7 @@ export default function Contact() {
       </h2>
       <div className="h-0.5 w-10 bg-gradient-to-r from-green-400 to-transparent rounded mb-9" />
 
-      <div className="grid sm:grid-cols-2 gap-5">
+      <div className={`grid gap-5 ${activeSocials.length ? 'sm:grid-cols-2' : ''}`}>
         {/* Direct contact */}
         <div className="bg-white dark:bg-slate-900 border border-slate-900/7 dark:border-white/8 rounded-2xl shadow-[0_1px_6px_rgba(0,0,0,.04),0_4px_18px_rgba(0,0,0,.03)] p-6 sm:p-7 relative overflow-hidden
           transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_10px_40px_rgba(0,0,0,.09)]">
@@ -65,6 +66,7 @@ export default function Contact() {
         </div>
 
         {/* Social */}
+        {activeSocials.length > 0 && (
         <div className="bg-white dark:bg-slate-900 border border-slate-900/7 dark:border-white/8 rounded-2xl shadow-[0_1px_6px_rgba(0,0,0,.04),0_4px_18px_rgba(0,0,0,.03)] p-6 sm:p-7 relative overflow-hidden
           transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_10px_40px_rgba(0,0,0,.09)]">
           <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-green-400/40 to-transparent" />
@@ -75,7 +77,7 @@ export default function Contact() {
             <div className="font-['Tiro_Bangla'] text-[1.1rem] text-slate-900 dark:text-slate-100 font-semibold">সামাজিক মাধ্যম</div>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            {socialLinks.map((s, i) => {
+            {activeSocials.map((s, i) => {
               const platform = detectPlatform(s.href)
               const b = BRAND[platform]
               const Icon = PLATFORM_ICONS[platform]
@@ -94,6 +96,7 @@ export default function Contact() {
             })}
           </div>
         </div>
+        )}
       </div>
     </section>
   )

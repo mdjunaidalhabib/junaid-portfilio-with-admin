@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react'
 import { FaPhoneAlt, FaMapMarkerAlt, FaEnvelope, FaDownload, FaPaperPlane } from 'react-icons/fa'
 import { usePortfolioData } from '../data/PortfolioDataContext'
-import { BRAND, CONTACT_COLORS, PLATFORM_ICONS, detectPlatform } from '../data/brandColors'
+import { BRAND, CONTACT_COLORS, PLATFORM_ICONS, detectPlatform, hasValidLink } from '../data/brandColors'
 import { telHref, whatsappHref } from '../lib/phone'
 
 export default function Hero() {
   const { personalInfo, contactInfo, socialLinks } = usePortfolioData()
-  const facebookLink = socialLinks.find(s => detectPlatform(s.href) === 'facebook')
+  const facebookLink = socialLinks.find(s => detectPlatform(s.href) === 'facebook' && hasValidLink(s.href))
   const heroSocials = [
-    { label: 'ফেসবুক',       platform: 'facebook', href: facebookLink?.href || '#' },
+    ...(facebookLink ? [{ label: 'ফেসবুক', platform: 'facebook', href: facebookLink.href }] : []),
     { label: 'হোয়াটসঅ্যাপ', platform: 'whatsapp', href: whatsappHref(contactInfo.whatsapp) },
   ]
   const [vis, setVis] = useState(false)

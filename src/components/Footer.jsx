@@ -1,12 +1,18 @@
 import { usePortfolioData } from '../data/PortfolioDataContext'
-import { BRAND, PLATFORM_ICONS, detectPlatform } from '../data/brandColors'
+import { BRAND, PLATFORM_ICONS, detectPlatform, hasValidLink } from '../data/brandColors'
 import { whatsappHref } from '../lib/phone'
 
 export default function Footer() {
   const { personalInfo, contactInfo, socialLinks, footerDua } = usePortfolioData()
+
+  // যতগুলো সোশ্যাল লিংক এডমিন প্যানেলে বাস্তবে যোগ করা আছে (খালি/প্লেসহোল্ডার
+  // বাদে) শুধু ততগুলোরই আইকন এখানে দেখাবে — লিংকের ধরন দেখে আইকন/রঙ অটোমেটিক
+  const dynamicSocials = socialLinks
+    .filter(s => hasValidLink(s.href))
+    .map(s => ({ label: s.label, platform: detectPlatform(s.href), href: s.href }))
+
   const footerIcons = [
-    { label: 'ফেসবুক',       platform: 'facebook', href: socialLinks.find(s => detectPlatform(s.href) === 'facebook')?.href || '#' },
-    { label: 'ইউটিউব',       platform: 'youtube',  href: socialLinks.find(s => detectPlatform(s.href) === 'youtube')?.href  || '#' },
+    ...dynamicSocials,
     { label: 'হোয়াটসঅ্যাপ', platform: 'whatsapp', href: whatsappHref(contactInfo.whatsapp) },
     { label: 'ইমেইল',        platform: 'email',    href: `mailto:${contactInfo.email}` },
   ]
