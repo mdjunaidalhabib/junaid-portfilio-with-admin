@@ -1,7 +1,7 @@
 import { useReveal } from '../hooks/useReveal'
 import { FaEnvelope, FaPhone, FaMapMarker } from 'react-icons/fa'
 import { usePortfolioData } from '../data/PortfolioDataContext'
-import { BRAND, CONTACT_COLORS, PLATFORM_ICONS, detectPlatform, hasValidLink } from '../data/brandColors'
+import { BRAND, CONTACT_COLORS, PLATFORM_ICONS, detectPlatform, hasValidLink, resolveSocialHref } from '../data/brandColors'
 import { telHref } from '../lib/phone'
 
 export default function Contact() {
@@ -78,11 +78,12 @@ export default function Contact() {
           </div>
           <div className="grid grid-cols-2 gap-3">
             {activeSocials.map((s, i) => {
-              const platform = detectPlatform(s.href)
+              const resolvedHref = resolveSocialHref(s.label, s.href)
+              const platform = detectPlatform(resolvedHref)
               const b = BRAND[platform]
               const Icon = PLATFORM_ICONS[platform]
               return (
-                <a key={s.label} href={s.href}
+                <a key={s.label} href={resolvedHref}
                   className="stagger-item flex flex-col items-center text-center gap-2 px-3 py-4 border rounded-2xl no-underline
                     text-slate-600 dark:text-slate-300 transition-all duration-250 hover:-translate-y-1 hover:shadow-[0_8px_20px_rgba(0,0,0,.07)]"
                   style={{ borderColor: 'rgba(15,23,42,.08)', animationDelay: `${i * 90}ms` }}

@@ -32,6 +32,22 @@ export function detectPlatform(href) {
   return 'website'
 }
 
+// "সামাজিক মাধ্যম" এর জেনেরিক লিংক ফিল্ডে হোয়াটসঅ্যাপের জন্য শুধু নাম্বার
+// লিখলেই (লেবেলে "WhatsApp/হোয়াটসঅ্যাপ" লেখা থাকলে, বা মানটা শুধু সংখ্যা
+// হলে) এটা স্বয়ংক্রিয়ভাবে সঠিক wa.me লিংকে রূপান্তরিত হয়ে যায় — আলাদা
+// করে পুরো লিংক টাইপ করার দরকার হয় না
+export function resolveSocialHref(label, href) {
+  const raw = (href || '').trim()
+  if (!raw || raw === '#' || /^(https?:|mailto:|tel:)/i.test(raw)) return raw
+  const looksLikeWhatsapp = /whatsapp|হোয়াটসঅ্যাপ/i.test(label || '') || /^[+]?[\d\s-]{6,}$/.test(raw)
+  if (!looksLikeWhatsapp) return raw
+  let d = raw.replace(/\D/g, '')
+  if (d.startsWith('880')) d = d.slice(3)
+  else if (d.startsWith('88')) d = d.slice(2)
+  if (d.startsWith('0')) d = d.slice(1)
+  return d ? `https://wa.me/880${d}` : raw
+}
+
 // এডমিন প্যানেলে যে লিংকগুলো এখনো খালি/প্লেসহোল্ডার ('#' বা ফাঁকা) রয়ে গেছে,
 // সেগুলো ফ্রন্টএন্ডে না দেখানোর জন্য এই ফাংশন দিয়ে ফিল্টার করা হয়
 export function hasValidLink(href) {

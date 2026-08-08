@@ -1,5 +1,5 @@
 import { usePortfolioData } from '../data/PortfolioDataContext'
-import { BRAND, PLATFORM_ICONS, detectPlatform, hasValidLink } from '../data/brandColors'
+import { BRAND, PLATFORM_ICONS, detectPlatform, hasValidLink, resolveSocialHref } from '../data/brandColors'
 import { whatsappHref } from '../lib/phone'
 
 export default function Footer() {
@@ -9,7 +9,10 @@ export default function Footer() {
   // বাদে) শুধু ততগুলোরই আইকন এখানে দেখাবে — লিংকের ধরন দেখে আইকন/রঙ অটোমেটিক
   const dynamicSocials = socialLinks
     .filter(s => hasValidLink(s.href))
-    .map(s => ({ label: s.label, platform: detectPlatform(s.href), href: s.href }))
+    .map(s => {
+      const resolvedHref = resolveSocialHref(s.label, s.href)
+      return { label: s.label, platform: detectPlatform(resolvedHref), href: resolvedHref }
+    })
 
   const footerIcons = [
     ...dynamicSocials,

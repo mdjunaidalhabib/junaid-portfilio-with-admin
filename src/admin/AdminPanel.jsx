@@ -515,7 +515,7 @@ function PdfUploadField({ value, onChange }) {
 
 // অ্যারে-আইটেমের কিছু ইংরেজি ফিল্ড-কী-এর জন্য বাংলা লেবেল
 const ARRAY_FIELD_LABELS = {
-  socialLinks: { label: 'নাম', href: 'লিংক' },
+  socialLinks: { label: 'নাম', href: 'লিংক (হোয়াটসঅ্যাপের জন্য শুধু নাম্বার লিখলেই হবে)' },
   educations: { year: 'সাল', degree: 'ডিগ্রি / সনদ', inst: 'প্রতিষ্ঠানের নাম', badge: 'ব্যাজ (ঐচ্ছিক)', category: 'ক্যাটাগরি', grade: 'গ্রেড', point: 'পয়েন্ট (ঐচ্ছিক)' },
   roles: { icon: 'আইকন (ইমোজি)', title: 'শিরোনাম', desc: 'বিবরণ' },
   writings: { type: 'ধরন', title: 'শিরোনাম', sub: 'উপশিরোনাম', icon: 'আইকন (ইমোজি)', gold: 'বিশেষ (গোল্ড রঙ)', href: 'লিংক' },
