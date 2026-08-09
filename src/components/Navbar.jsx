@@ -70,7 +70,7 @@ export default function Navbar() {
               }
             </div>
             <div className="min-w-0">
-              <div className="font-['Tiro_Bangla'] text-slate-900 dark:text-slate-100 text-[.92rem] md:text-[1rem] font-semibold leading-tight truncate">{personalInfo.name}</div>
+              <div className="font-['Tiro_Bangla'] text-slate-900 dark:text-slate-100 text-[.92rem] md:text-[1rem] font-semibold" style={{ lineHeight: 1.5 }}>{personalInfo.name}</div>
               <div className="hidden sm:block text-[.58rem] text-green-600 dark:text-green-400 tracking-[.12em] uppercase">{personalInfo.tagline}</div>
             </div>
           </a>
@@ -169,7 +169,7 @@ export default function Navbar() {
               }
             </div>
             <div className="min-w-0">
-              <div className="font-['Tiro_Bangla'] text-slate-900 dark:text-slate-100 text-[.9rem] font-semibold leading-tight truncate">{personalInfo.name}</div>
+              <div className="font-['Tiro_Bangla'] text-slate-900 dark:text-slate-100 text-[.9rem] font-semibold" style={{ lineHeight: 1.5 }}>{personalInfo.name}</div>
               <div className="text-[.55rem] text-green-600 dark:text-green-400 tracking-[.12em] uppercase">{personalInfo.tagline}</div>
             </div>
           </div>
